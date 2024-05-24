@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>システム構想</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- カスタムCSS -->
+    <link href="{% static 'mario/css/mario.css' %}" rel="stylesheet">
+    <style>
+        .box {
+            padding: 10px; /* ボックス内の余白を追加 */
+            background-color: transparent; /* 背景色を透明に設定 */
+            border-color:--bs-info; /* 枠の色を指定 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid h-100">
+        <div class="row h-50">
+            <div class="col-md-6">
+                <div class="box border rounded-top rounded-right" id="play-video">プレイ動画</div>
+            </div>
+            <div class="col-md-6">
+                <div class="box border rounded-top rounded-left" id="clear-values">そのゲームにおいて、クリア等に必要な数値を提示する場所</div>
+            </div>
+        </div>
+        <div class="row h-50">
+            <div class="col-md-6">
+                <div class="box border rounded-bottom rounded-right" id="script">それぞれの箇所、タイミングに対して、あらかじめ用意したスクリプトを表示する</div>
+            </div>
+            <div class="col-md-6">
+                <div class="box border rounded-bottom rounded-left" id="feedback">選択肢欄 今のこととしては（アドバイスの専門性、アドバイスが多刻であるかどうかのフィードバック等）</div>
+            </div>
+        </div>
+    </div>
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
