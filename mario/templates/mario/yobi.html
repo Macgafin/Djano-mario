@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>システム構想</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- カスタムCSS -->
+    <link href="{% static 'mario/css/mario.css' %}" rel="stylesheet">
+    <style>
+        .box {
+            padding: 20px; /* ボックス内の余白を追加 */
+            background-color: white; /* 背景色を濃い青に設定 */
+            color: teal; /* テキストの色を白に設定 */
+            border: 2px solid #17a2b8; /* 枠の色を青に指定 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px; /* 角を丸くする */
+            box-sizing: border-box; /* 枠を含めたボックスサイズを設定 */
+        }
+        
+        .outer-container {
+            margin-left: 30px; /* 画面の左端から30px離れる */
+            height: 100vh; /* ビューポートの高さいっぱいに設定 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 3fr 2fr; /* 3:2 の比率で幅を設定 */
+            grid-template-rows: 3fr 2fr; /* 3:2 の比率で高さを設定 */
+            gap: 10px; /* オプション: ボックス間の隙間を追加 */
+            max-width: 100%; /* 最大幅を100%に設定 */
+            height: 90%; /* .outer-container の90%の高さに設定 */
+        }
+    </style>
+</head>
+<body>
+    <div class="outer-container">
+        <div class="container">
+            <div class="box" id="play-video">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="box" id="clear-values">
+                <h3>クリアに必要な数値</h3>
+                <p>クリアまでの残り時間: 30分</p>
+                <p>コインの枚数: 50枚</p>
+            </div>
+            <div class="box" id="script">
+                <h3>スクリプト</h3>
+                <p>第1ステージでの敵の動きについてのスクリプト</p>
+                <a href="script_details.html">詳細を見る</a>
+            </div>
+            <div class="box" id="feedback">
+                <h3>選択肢欄</h3>
+                <form action="/submit_feedback" method="POST">
+                    <label for="feedback_input">アドバイスを入力してください:</label>
+                    <textarea id="feedback_input" name="feedback"></textarea>
+                    <button type="submit">送信</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+<!-- OBSのスイッチの画面をリアルタイムでキャストするためには、OBSの「ウェブカメラ」や「デスクトップキャプチャ」などの機能を使用して、OBSでキャプチャしている画面をURL経由で配信する必要があります。これを行うためには、OBSのウェブサーバー機能を使用して、OBSが配信している画面をWebブラウザーで表示できるように設定する必要があります。
+
+以下は、OBSでウェブカメラやデスクトップをキャプチャして配信し、それをWebブラウザーで表示する方法の基本的な手順です。
+
+OBSで配信する画面を設定する:
+
+OBSを開き、キャプチャしたいウェブカメラやデスクトップをキャプチャソースとして追加します。
+必要に応じて、キャプチャソースの配置やサイズを調整します。
+OBSの設定で、配信の設定（ストリーミングサービスやカスタムサーバー）を行います。配信URLやストリームキーが生成されます。
+OBSのウェブサーバーを有効にする:
+
+OBSの設定で、ウェブサーバーを有効にします。
+ウェブサーバーのポート番号やアクセス許可などの設定を行います。
+HTMLページを作成する:
+
+OBSのウェブサーバーが提供するURLにアクセスするためのHTMLページを作成します。
+<video>要素などを使用して、OBSの配信画面を表示するコードを記述します。
+OBSのウェブサーバーから配信される画面を表示するためのURLをsrc属性に指定します。
+HTMLページをブラウザーで開く:
+
+作成したHTMLページをWebブラウザーで開いて、OBSが配信している画面を確認します。
+HTMLページを必要な場所に埋め込む:
+
+必要に応じて、HTMLページをウェブサイトや他のプラットフォームに埋め込んで、他のユーザーがアクセスできるようにします。
+こうして設定することで、OBSで配信している画面をリアルタイムでHTMLページ経由で見ることができます。 -->
