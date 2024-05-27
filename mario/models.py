@@ -14,7 +14,12 @@ class Script(models.Model):
     text = models.TextField()
     timing = models.IntegerField()
     
-class Feedback(models.Model):
+class OurFeedback(models.Model):
+    advice = models.TextField()
+    is_expert = models.BooleanField()
+    is_timely = models.BooleanField
+    
+class PlayerFeedback(models.Model):
     advice = models.TextField()
     is_expert = models.BooleanField()
     is_timely = models.BooleanField

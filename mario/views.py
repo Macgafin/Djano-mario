@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import PlayVideo, ClearValue, Script, Feedback
+from .models import PlayVideo, ClearValue, Script, OurFeedback, PlayerFeedback
 import os
 from django.conf import settings
 
@@ -9,7 +9,8 @@ def home(request):
     videos = PlayVideo.objects.all()
     clear_values = ClearValue.objects.all()
     scripts = Script.objects.all()
-    feedbacks = Feedback.objects.all()
+    ourfeedbacks = OurFeedback.objects.all()
+    playerfeedbacks = PlayerFeedback.objects.all()
     
     # ビデオファイルのパスを設定
     video_file_path = os.path.join(settings.STATIC_ROOT, 'mario/Screen information/stage 1 short vr.mp4')
@@ -18,7 +19,9 @@ def home(request):
         'videos': videos,
         'clear_values': clear_values,
         'scripts': scripts,
-        'feedbacks': feedbacks
+        'ourfeedbacks': ourfeedbacks,
+        'playerfeedbacks': playerfeedbacks,
+        
     })
 
 def information(request, video_name):

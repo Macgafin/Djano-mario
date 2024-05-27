@@ -5,23 +5,22 @@
 <head>
     <title>システム構想</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .box {
-            padding: 20px; /* ボックス内の余白を追加 */
-            background-color: white; /* 背景色を濃い青に設定 */
-            color: teal; /* テキストの色を白に設定 */
-            border: 2px solid #17a2b8; /* 枠の色を青に指定 */
+            padding: 20px;
+            background-color: white;
+            color: teal;
+            border: 2px solid #17a2b8;
+            border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 30px; /* 角を丸くする */
-            box-sizing: border-box; /* 枠を含めたボックスサイズを設定 */
         }
         
         .outer-container {
-            margin-left: 30px; /* 画面の左端から30px離れる */
-            height: 100vh; /* ビューポートの高さいっぱいに設定 */
+            margin: 30px;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -29,11 +28,25 @@
 
         .container {
             display: grid;
-            grid-template-columns: 3fr 2fr; /* 3:2 の比率で幅を設定 */
-            grid-template-rows: 3fr 2fr; /* 3:2 の比率で高さを設定 */
-            gap: 10px; /* オプション: ボックス間の隙間を追加 */
-            max-width: 100%; /* 最大幅を100%に設定 */
-            height: 90%; /* .outer-container の90%の高さに設定 */
+            grid-template-columns: 3fr 2fr;
+            grid-template-rows: 3fr 2fr;
+            gap: 20px;
+            width: 100%;
+            height: 90%;
+        }
+
+        .ratio {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 aspect ratio */
+        }
+
+        .ratio video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -43,25 +56,20 @@
         <div class="container">
             <!-- ビデオ関連 -->
             <div class="box" id="play-video">
-                <div class="ratio ratio-16x9">
+                <div class="ratio">
                     <video class="embed-responsive-item" controls>
                         <source src="{% static 'mario/stage 1 short vr.mp4' %}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-
-                    <!--OBSでリアルタイムで読み込むときに使う
-                        <iframe class="embed-responsive-item" src="{% static 'mario/Screen information/stage 1 short vr.mp4' %}" allowfullscreen></iframe>
-                    -->
                 </div>
             </div>
 
-            <!-- ゲームないの数値を表示する場所 -->
+            <!-- ゲーム情報 -->
             <div class="box" id="clear-values">
-                <<h3>ゲーム情報</h3>
+                <h3>ゲーム情報</h3>
                 <ul class="list-group">
                     {% for info in game_info %}
                     <li class="list-group-item">
-                        <!-- 画像の情報を表示 -->
                         {% if info.0 == '0' %}
                             Small Mario は ({{ info.1 }}, {{ info.2 }}) にいます。
                         {% elif info.0 == '1' %}
@@ -97,10 +105,10 @@
                         {% endif %}
                     </li>
                     {% endfor %}
-                </url>
+                </ul>
             </div>
 
-            <!-- 現在の動きにや敵の情報をまとめとくスクリプト -->
+            <!-- スクリプト -->
             <div class="box" id="script">
                 <h3>スクリプト</h3>
                 <p>第1ステージでの敵の動きについてのスクリプト</p>
@@ -117,7 +125,6 @@
                     </div>
                     <button type="submit" class="btn btn-primary">送信</button>
                 </form>
-                <!-- システムの使用感を入力するフォーム -->
                 <h3>システムの使用感</h3>
                 <form action="/submit_experience" method="POST">
                     <div class="form-group">
@@ -130,14 +137,12 @@
         </div>
     </div>
     <!-- JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
 </body>
 
 </html>
-
-
 
 
 

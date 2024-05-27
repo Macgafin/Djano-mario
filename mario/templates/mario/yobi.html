@@ -6,8 +6,6 @@
     <title>システム構想</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- カスタムCSS -->
-    <link href="{% static 'mario/css/mario.css' %}" rel="stylesheet">
     <style>
         .box {
             padding: 20px; /* ボックス内の余白を追加 */
@@ -39,30 +37,94 @@
         }
     </style>
 </head>
+
 <body>
     <div class="outer-container">
         <div class="container">
+            <!-- ビデオ関連 -->
             <div class="box" id="play-video">
-                <div class="embed-responsive embed-responsive-16by9">
-                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe>
+                <div class="ratio ratio-16x9">
+                    <video class="embed-responsive-item" controls>
+                        <source src="{% static 'mario/stage 1 short vr.mp4' %}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+
+                    <!--OBSでリアルタイムで読み込むときに使う
+                        <iframe class="embed-responsive-item" src="{% static 'mario/Screen information/stage 1 short vr.mp4' %}" allowfullscreen></iframe>
+                    -->
                 </div>
             </div>
+
+            <!-- ゲームないの数値を表示する場所 -->
             <div class="box" id="clear-values">
-                <h3>クリアに必要な数値</h3>
-                <p>クリアまでの残り時間: 30分</p>
-                <p>コインの枚数: 50枚</p>
+                <<h3>ゲーム情報</h3>
+                <ul class="list-group">
+                    {% for info in game_info %}
+                    <li class="list-group-item">
+                        <!-- 画像の情報を表示 -->
+                        {% if info.0 == '0' %}
+                            Small Mario は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '1' %}
+                            Big Mario は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '2' %}
+                            Fire Mario は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '3' %}
+                            Fish は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '4' %}
+                            Nokonoko は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '5' %}
+                            Coin は ({{ info.1 }}, {{ info.2 }}) にあります。
+                        {% elif info.0 == '6' %}
+                            Kuribo は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '7' %}
+                            Hatena Block は ({{ info.1 }}, {{ info.2 }}) にあります。
+                        {% elif info.0 == '8' %}
+                            Kinoko は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '9' %}
+                            Scaffold は ({{ info.1 }}, {{ info.2 }}) にあります。
+                        {% elif info.0 == '10' %}
+                            Pipe は ({{ info.1 }}, {{ info.2 }}) にあります。
+                        {% elif info.0 == '11' %}
+                            P Flower は ({{ info.1 }}, {{ info.2 }}) にあります。
+                        {% elif info.0 == '12' %}
+                            Togezo は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '13' %}
+                            Mario S to B は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '14' %}
+                            Star Mario は ({{ info.1 }}, {{ info.2 }}) にいます。
+                        {% elif info.0 == '15' %}
+                            Star は ({{ info.1 }}, {{ info.2 }}) にあります。
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </url>
             </div>
+
+            <!-- 現在の動きにや敵の情報をまとめとくスクリプト -->
             <div class="box" id="script">
                 <h3>スクリプト</h3>
                 <p>第1ステージでの敵の動きについてのスクリプト</p>
-                <a href="script_details.html">詳細を見る</a>
+                <a href="script_details.html" class="btn btn-primary">詳細を見る</a>
             </div>
+
+            <!-- フィードバックとシステムの使用感を入力するフォーム -->
             <div class="box" id="feedback">
-                <h3>選択肢欄</h3>
+                <h3>フィードバック</h3>
                 <form action="/submit_feedback" method="POST">
-                    <label for="feedback_input">アドバイスを入力してください:</label>
-                    <textarea id="feedback_input" name="feedback"></textarea>
-                    <button type="submit">送信</button>
+                    <div class="form-group">
+                        <label for="feedback_input">改善案を入力してください:</label>
+                        <textarea class="form-control" id="feedback_input" name="feedback"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">送信</button>
+                </form>
+                <!-- システムの使用感を入力するフォーム -->
+                <h3>システムの使用感</h3>
+                <form action="/submit_experience" method="POST">
+                    <div class="form-group">
+                        <label for="experience_input">システムの使用感を入力してください:</label>
+                        <textarea class="form-control" id="experience_input" name="experience"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">送信</button>
                 </form>
             </div>
         </div>
@@ -72,6 +134,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>
 
 
