@@ -5,5 +5,5 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('information/', views.information, name='information'),  # informationビューへのパスを追加
+    path('image_details/', views.image_details, name='image_details'),  # image_details,ビューへのパスを追加
 ]

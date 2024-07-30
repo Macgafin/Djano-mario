@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>システム構想</title>
+    <title>マリオ対策システム</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -48,6 +48,10 @@
             width: 100%;
             height: 100%;
         }
+
+        .list-group-item{
+            
+        }
     </style>
 </head>
 
@@ -67,7 +71,9 @@
             <!-- ゲーム情報 -->
             <div class="box" id="clear-values">
                 <h3>ゲーム情報</h3>
+
                 <ul class="list-group">
+                    {% if game_info %}
                     {% for info in game_info %}
                     <li class="list-group-item">
                         {% if info.0 == '0' %}
@@ -105,6 +111,9 @@
                         {% endif %}
                     </li>
                     {% endfor %}
+                {% else %}
+                    <li class="list-group-item">No game information available.</li>
+                {% endif %}
                 </ul>
             </div>
 
@@ -112,7 +121,7 @@
             <div class="box" id="script">
                 <h3>スクリプト</h3>
                 <p>第1ステージでの敵の動きについてのスクリプト</p>
-                <a href="script_details.html" class="btn btn-primary">詳細を見る</a>
+                <a href="image_details.html" class="btn btn-primary">詳細を見る</a>
             </div>
 
             <!-- フィードバックとシステムの使用感を入力するフォーム -->
