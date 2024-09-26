@@ -16,6 +16,7 @@ def process_game_info(game_info, current_time):
         return "Marioが見つかりませんでした"
 
     for element in game_info:
+        #バウンディングボックスの重なり確認
         if element != mario and 'Mario' not in element['code']:
             if (mario['x'] < element['x'] + element['width'] and
                 mario['x'] + mario['width'] > element['x'] and

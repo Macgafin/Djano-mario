@@ -1,6 +1,7 @@
-{% load django_bootstrap5 %}
 {% load static %}
+{% load django_bootstrap5 %}
 
+<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="utf-8">
@@ -10,72 +11,144 @@
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <style>
-      .box {
-          padding: 20px;
-          background-color: white;
-          color: teal;
-          border: 2px solid #17a2b8;
-          border-radius: 30px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-      }
-      
-      .outer-container {
-          margin: 30px;
-          height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-      }
+        .box {
+            padding: 20px;
+            background-color: white;
+            color: #17a2b8;
+            border: 2px solid #17a2b8;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .outer-container {
+            margin: 30px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-      .container {
-          display: grid;
-          grid-template-columns: 3fr 2fr;
-          grid-template-rows: 3fr 2fr;
-          gap: 20px;
-          width: 100%;
-          height: 90%;
-      }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
 
-      .ratio {
-          position: relative;
-          width: 100%;
-          padding-top: 56.25%; /* 16:9 aspect ratio */
-      }
+        .ratio {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 aspect ratio */
+        }
 
-      .ratio video {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-      }
+        .ratio video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-      .list-group-item {
-          margin: 5px 0;
-          padding: 10px;
-          background-color: #f8f9fa;
-          border: 1px solid #dee2e6;
-          border-radius: 5px;
-      }
+        .list-group-item {
+            border: none;
+            padding: 10px;
+            color: #17a2b8; /* テキストカラー変更 */
+        }
+
+        .list-group-item:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 2fr 1fr;
+                grid-template-rows: auto;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="outer-container">
-      <div class="container">
-          <!-- ビデオ関連 -->
-          <div class="box" id="play-video">
-              <div class="ratio">
-                  <video class="embed-responsive-item" controls>
-                      <source src="{% static 'mario/stage 1 short vr.mp4' %}" type="video/mp4">
-                      Your browser does not support the video tag.
-                  </video>
-              </div>
-          </div>
-      </div>
+        <div class="container">
+            <!-- ビデオ関連 -->
+            <div class="box" id="play-video">
+                <div class="ratio">
+                    <video class="embed-responsive-item" controls autoplay>
+                        <source src="{% static 'mario_django/mainproject/mario/realtime_detection.mp4' %}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+
+            <!-- ゲーム情報 -->
+            <div class="box" id="clear-values">
+                <h3>ゲーム情報</h3>
+                <ul class="list-group list-group">
+                    {% for info in game_info %}
+                          <li class="list-group-item">
+                            {{ info.code }} x: {{ info.x }} y: {{ info.y }} 
+                          </li>
+                    {% empty %}
+                      <li class="list-group-item">情報がありません</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- スクリプト -->
+            <div class="box" id="script">
+                <h3>スクリプト</h3>
+                <p>フィードバック： {{ scripts }}</p>
+                <a href="{% url 'image_details' %}" class="btn btn-primary">詳細を見る</a>
+            </div>
+
+            <!-- フィードバックとシステムの使用感を入力するフォーム -->
+            <div class="box" id="feedback">
+                <h3>フィードバック</h3>
+                <form action="/submit_feedback" method="POST">
+                    <div class="form-group">
+                        <label for="feedback_input">改善案を入力してください:</label>
+                        <textarea class="form-control" id="feedback_input" name="feedback"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">送信</button>
+                </form>
+                <h3>システムの使用感</h3>
+                <form action="/submit_experience" method="POST">
+                    <div class="form-group">
+                        <label for="experience_input">システムの使用感を入力してください:</label>
+                        <textarea class="form-control" id="experience_input" name="experience"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">送信</button>
+                </form>
+            </div>
+        </div>
     </div>
-   
+    
+    <script>
+        // WebSocketの接続
+        var ws = new WebSocket('ws://' + window.location.host + '/ws/game-info/');
+    
+        ws.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+            var infoList = document.getElementById('game-info-list');
+            infoList.innerHTML = ''; // 現在の内容をクリア
+            data.game_info.forEach(function(info) {
+                var li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = `Class: ${info.cls}, x: ${info.x}, y: ${info.y}`;
+                infoList.appendChild(li);
+            });
+        };
+    
+        ws.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly');
+        };
+    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-  </body>
+</body>
+
 </html>

@@ -2,8 +2,10 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import stream_view
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('video/', stream_view, name='video_stream'),
     path('image_details/', views.image_details, name='image_details'),  # image_details,ビューへのパスを追加
 ]

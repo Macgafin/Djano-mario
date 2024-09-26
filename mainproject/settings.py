@@ -130,3 +130,22 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
+
+CODE_TEXTS = {
+    '0': 'Small Mario ：',
+    '1': 'Big Mario ：',
+    '2': 'Fire Mario ：',
+    '3': 'Fish  ：',
+    '4': 'Nokonoko  ：',
+    '5': 'Coin ：',
+    '6': 'Kuribo  ：',
+    '7': 'Hatena Block：',
+    '8': 'Kinoko ：',
+    '9': 'Scaffold ：',
+    '10': 'Pipe ：',
+    '11': 'P Flower ：',
+    '12': 'Togezo ：',
+    '13': 'Mario S to B ：',
+    '14': 'Star Mario ：',
+    '15': 'Star ：',
+}
