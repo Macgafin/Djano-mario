@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "channels",
     "mario.apps.MarioConfig",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -53,6 +54,17 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mainproject.urls'
 
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
+]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # または Redis を使用する場合は適切な設定
+    },
+}
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -70,6 +82,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mainproject.wsgi.application'
+ASGI_APPLICATION = 'mainproject.asgi.application'
 
 
 # Database

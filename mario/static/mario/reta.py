@@ -22,7 +22,7 @@ height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 out = cv2.VideoWriter(str(video_output_path), fourcc, fps, (width, height))
 
 # テキストファイルのパス
-text_output_path = script_dir / 'realtime_analitics.txt'
+text_output_path = script_dir / 'realtime_analytics.txt'
 
 while cap.isOpened():
     ret, frame = cap.read()
