@@ -126,9 +126,18 @@
     
     <script>
         const gameInfoSocket = new WebSocket('ws://localhost:8000/ws/game-info/');
-    
+
+        
+
+        setInterval(() => {
+            console.log("hellow");
+            gameInfoSocket.send(JSON.stringify({}));
+        },1000);
+
         gameInfoSocket.onmessage = function(e) {
+            
             const data = JSON.parse(e.data);
+            console.log(data);
             const gameInfoList = document.getElementById('clear-values');
     
             // 既存の情報をクリア

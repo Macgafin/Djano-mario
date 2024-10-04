@@ -8,11 +8,11 @@ class GameInfoConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         pass
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
+    async def receive(self, game_info):
+        text_data_json = json.loads(game_info)
         game_info = text_data_json['game_info']
 
         # 受信したデータをクライアントに送信
         await self.send(text_data=json.dumps({
-            'message': game_info
+            'message': "ahow"
         }))
