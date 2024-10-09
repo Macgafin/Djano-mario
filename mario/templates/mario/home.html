@@ -84,14 +84,8 @@
             <!-- ゲーム情報 -->
             <div class="box" id="clear-values">
                 <h3>ゲーム情報</h3>
-                <ul class="list-group list-group">
-                    {% for info in game_info %}
-                          <li class="list-group-item">
-                            {{ info.code }} x: {{ info.x }} y: {{ info.y }} 
-                          </li>
-                    {% empty %}
-                      <li class="list-group-item">情報がありません</li>
-                    {% endfor %}
+                <ul class="list-group list-group" id="game-info">
+                    <!-- WebSocketからのgame_infoをここにリアルタイムで追加 -->
                 </ul>
             </div>
 
@@ -125,43 +119,60 @@
     </div>
     
     <script>
+        // WebSocketの接続を作成
         const gameInfoSocket = new WebSocket('ws://localhost:8000/ws/game-info/');
-
-        
-
-        setInterval(() => {
-            console.log("hellow");
-            gameInfoSocket.send(JSON.stringify({}));
-        },1000);
-
-        gameInfoSocket.onmessage = function(e) {
-            
-            const data = JSON.parse(e.data);
-            console.log(data);
-            const gameInfoList = document.getElementById('clear-values');
+        // WebSocketが接続されたときの処理
+        gameInfoSocket.onopen = function() {
+            console.log('WebSocket connection established');
+        };
     
-            // 既存の情報をクリア
+        // WebSocketでメッセージを受信したときの処理
+        gameInfoSocket.onmessage = function(event) {
+            console.log('Message received:', data);  // 受信したメッセージをログに表示
+            const data = JSON.parse(event.data);  // WebSocketから受け取ったデータをJSONに変換
+
+            const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
+    
+            // 現在のリストの中身を確認
+            console.log("Current before contents of gameInfoList:", gameInfoList.innerHTML);
+
+            // 既存のリストの中身をクリア
             gameInfoList.innerHTML = '';
+
+            // 現在のリストの中身を確認
+            console.log("Current after contents of gameInfoList:", gameInfoList.innerHTML);
     
-            // 新しい情報を追加
+            // game_infoが存在する場合、新しいリストアイテムを作成して追加
             if (data.game_info.length > 0) {
                 data.game_info.forEach(info => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('list-group-item');
-                    listItem.textContent = info;
+                    const listItem = document.createElement('li');  // 新しいliタグを作成
+                    listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
+    
+                    // liタグに情報を追加（code, x, yを表示）
+                    listItem.textContent = `コード: ${info.code}, x: ${info.x}, y: ${info.y}`;
+                    
+                    // ulタグにliタグを追加
                     gameInfoList.appendChild(listItem);
                 });
             } else {
+                // game_infoが空の場合の処理
                 const listItem = document.createElement('li');
                 listItem.classList.add('list-group-item');
-                listItem.textContent = '情報がありません';
+                listItem.textContent = '情報がありません';  // 情報がない場合のメッセージを表示
                 gameInfoList.appendChild(listItem);
             }
         };
     
+        // WebSocketが予期せず閉じられたときのエラーハンドリング
         gameInfoSocket.onclose = function(e) {
             console.error('WebSocket closed unexpectedly');
         };
+
+        // WebSocketのエラーハンドリング
+        gameInfoSocket.onerror = function(e) {
+            console.error('WebSocket error:', e);
+        };
+
     </script>
     
     

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-i16m)os08v+f$^!d0_)q(t=a@$+o(4+p2q-ysx@&hpc1ej(wvt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -60,7 +60,11 @@ CORS_ALLOWED_ORIGINS = [
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # または Redis を使用する場合は適切な設定
+        # 'BACKEND': 'channels.layers.InMemoryChannelLayer',  # または Redis を使用する場合は適切な設定
+        'BACKEND': 'channels_redis.core.RedisChannelLayer', #本番環境用のやつ、やりたくねぇ
+        'CONFIG': {
+            "hosts": [("127.0.0.1", 6379)],
+        },
     },
 }
 

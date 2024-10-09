@@ -7,13 +7,17 @@ from asgiref.sync import async_to_sync
 from django.http import StreamingHttpResponse
 import aiofiles
 import asyncio
+import logging
 
 # モデルのパス
 model_path = Path(__file__).resolve().parent / 'static/mario/best.pt'
 text_output_path = Path(__file__).resolve().parent / 'static/mario/realtime_analytics.txt'
 
+# ログレベルをWARNINGに設定することで、INFOレベルの出力を抑制
+logging.getLogger('ultralytics').setLevel(logging.WARNING)
 # YOLOv8モデルをロード
 model = YOLO(model_path)
+
 
 # 非同期ストリーミング関数
 async def video_stream():
