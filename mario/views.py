@@ -63,20 +63,23 @@ async def home(request):
     channel_layer = get_channel_layer()
     
     
-
+    print("start print game_info")
     print(game_info)  # game_infoの内容を確認
-        
+    print("end print game_info")
 
-    
-    await channel_layer.group_send(
-        'game_info',
-        {
-            'type': 'send_game_info',
-            'message': {
-                'game_info': game_info
+    try:
+        logger.info("Sending game_info to WebSocket group")
+        await channel_layer.group_send(
+            'game_info',
+            {
+                'type': 'send_game_info',  # receiveメソッドで処理するために'type'を指定
+                'message': game_info
             }
-        }
-    )
+        )
+        logger.info("Game info sent successfully")
+    except Exception as e:
+        logger.error(f"Error sending message: {e}")
+        
         
     # 現在時刻を記録
     current_time = time.time()

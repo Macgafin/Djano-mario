@@ -84,9 +84,7 @@
             <!-- ゲーム情報 -->
             <div class="box" id="clear-values">
                 <h3>ゲーム情報</h3>
-                <ul class="list-group list-group" id="game-info">
-                    <!-- WebSocketからのgame_infoをここにリアルタイムで追加 -->
-                </ul>
+                <ul class="list-group" id="game-info"></ul>
             </div>
 
             <!-- スクリプト -->
@@ -128,40 +126,22 @@
     
         // WebSocketでメッセージを受信したときの処理
         gameInfoSocket.onmessage = function(event) {
-            console.log('Message received:', data);  // 受信したメッセージをログに表示
-            const data = JSON.parse(event.data);  // WebSocketから受け取ったデータをJSONに変換
-
+            console.log(event.data);
+            {% comment %} const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
+            console.log('Message received:', data.game_info);  // 受信したメッセージをログに表示
+        
             const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
-    
-            // 現在のリストの中身を確認
-            console.log("Current before contents of gameInfoList:", gameInfoList.innerHTML);
-
-            // 既存のリストの中身をクリア
-            gameInfoList.innerHTML = '';
-
-            // 現在のリストの中身を確認
-            console.log("Current after contents of gameInfoList:", gameInfoList.innerHTML);
-    
-            // game_infoが存在する場合、新しいリストアイテムを作成して追加
-            if (data.game_info.length > 0) {
-                data.game_info.forEach(info => {
-                    const listItem = document.createElement('li');  // 新しいliタグを作成
-                    listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
-    
-                    // liタグに情報を追加（code, x, yを表示）
-                    listItem.textContent = `コード: ${info.code}, x: ${info.x}, y: ${info.y}`;
-                    
-                    // ulタグにliタグを追加
-                    gameInfoList.appendChild(listItem);
-                });
-            } else {
-                // game_infoが空の場合の処理
+            gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
+        
+            // 受信したゲーム情報を新しいリストアイテムとして追加
+            data.game_info.forEach(function(info) {
                 const listItem = document.createElement('li');
-                listItem.classList.add('list-group-item');
-                listItem.textContent = '情報がありません';  // 情報がない場合のメッセージを表示
-                gameInfoList.appendChild(listItem);
-            }
+                listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
+                listItem.textContent = `コード: ${info.code}, x: ${info.x}, y: ${info.y}, 幅: ${info.width}, 高さ: ${info.height}, 信頼度: ${info.confidence.toFixed(2)}`;  // 受信した情報を表示
+                gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
+            }); {% endcomment %}
         };
+        
     
         // WebSocketが予期せず閉じられたときのエラーハンドリング
         gameInfoSocket.onclose = function(e) {
@@ -174,9 +154,6 @@
         };
 
     </script>
-    
-    
-    
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
