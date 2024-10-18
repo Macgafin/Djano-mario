@@ -31,6 +31,11 @@ class GameInfoConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         # WebSocketからデータを受け取った時の処理
         logger.info(f"Received data from WebSocket: {text_data}")
+        await self.send(text_data=json.dumps({
+            # 'response': f'Received your message: {text_data}'
+            "response" : text_data
+        }))
+       
     
     # 'group_send'によって呼び出されるメソッド
     async def send_game_info(self, event):
