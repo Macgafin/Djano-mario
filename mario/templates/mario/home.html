@@ -137,7 +137,7 @@
             gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
         
             // 受信したゲーム情報を新しいリストアイテムとして追加
-            data.game_info.forEach(function(info) {
+            data.response.forEach(function(info) {
                 const listItem = document.createElement('li');
                 listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
                 listItem.textContent = `コード: ${info.code}, x: ${info.x}, y: ${info.y}, 幅: ${info.width}, 高さ: ${info.height}, 信頼度: ${info.confidence.toFixed(2)}`;  // 受信した情報を表示
@@ -147,7 +147,6 @@
         
         const intervalID = setInterval(() => {
             gameInfoSocket.send({
-                data : "baka"
             });
             console.log("send enmpty")
         }, 1000);

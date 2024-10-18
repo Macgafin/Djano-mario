@@ -1,3 +1,4 @@
+from asyncio.log import logger
 import os
 import time
 from pathlib import Path
@@ -11,13 +12,13 @@ from .viewservices import process_game_info
 from django.views.decorators.csrf import csrf_exempt
 import asyncio
 import logging
-from channels.layers import get_channel_layer
 
-# ロガーを設定
-logger = logging.getLogger(__name__)
 
-# ホームビューを非同期化
-async def home(request):
+
+async def read_gameinfo () :
+    
+    logger = logging.getLogger(__name__)
+    
     clear_values = await asyncio.to_thread(ClearValue.objects.all)
     scripts = await asyncio.to_thread(Script.objects.all)
     ourfeedbacks = await asyncio.to_thread(OurFeedback.objects.all)
@@ -58,49 +59,5 @@ async def home(request):
     except Exception as e:
         logger.exception('Error reading the game info file.')
         game_info.append({'error': 'ゲーム情報の読み込み中にエラーが発生しました。'})
-
-    # WebSocketにゲーム情報を送信する
-    channel_layer = get_channel_layer()
-    
-    
-    print("start print game_info")
-    print(game_info)  # game_infoの内容を確認
-    print("end print game_info")
-
-    try:
-        logger.info("Sending game_info to consumers.py")
-        await channel_layer.group_send(
-            'game_info',
-            {
-                'type': 'send_game_info',  # receiveメソッドで処理するために'type'を指定
-                'message': game_info
-            }
-        )
-        logger.info("Game info sent successfully")
-    except Exception as e:
-        logger.error(f"Error sending message: {e}")
         
-        
-    # 現在時刻を記録
-    current_time = time.time()
-    # サービス層の関数を呼び出す
-    scripts = process_game_info(game_info, current_time)
-
-    return render(request, "mario/home.html", {
-        'clear_values': clear_values,
-        'scripts': scripts,
-        'ourfeedbacks': ourfeedbacks,
-        'game_info': game_info,
-        'video_file_path': video_file_path,
-    })
-
-# 非同期ストリーミングビュー
-@csrf_exempt
-async def stream_view(request):
-    response = StreamingHttpResponse(video_stream(), content_type='multipart/x-mixed-replace; boundary=frame')
-    return response
-
-# フィードバックのより詳しい説明のページ
-def image_details(request):
-    game_info = []  # ゲーム情報を格納するリスト
-    return render(request, 'mario/image_details.html', {'game_info': game_info})
+    return game_info

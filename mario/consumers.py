@@ -1,6 +1,10 @@
 import json
+from pathlib import Path
+import aiofiles
 from channels.generic.websocket import AsyncWebsocketConsumer
 import logging
+
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -29,11 +33,52 @@ class GameInfoConsumer(AsyncWebsocketConsumer):
     
 
     async def receive(self, text_data):
+        
+        # text_empty = json.loads(text_data)
+        
+        # message = text_empty['message']
+        
         # WebSocketからデータを受け取った時の処理
         logger.info(f"Received data from WebSocket: {text_data}")
+        
+        # ゲーム情報
+        game_info = []
+        
+        # 読み込むテキストファイルのパスを設定
+        text_file_path = Path(settings.BASE_DIR) / 'mario' / 'static' / 'mario' / 'realtime_analytics.txt'
+        
+        # 設定からコードとテキストのマッピングを取得
+        code_texts = settings.CODE_TEXTS
+        
+        # 非同期でファイルの読み込みを行う
+        try:
+            if text_file_path.exists():
+                async with aiofiles.open(text_file_path, 'r') as file:
+                    async for line in file:
+                        data = line.strip().split()
+                        if len(data) >= 6 and data[0] in code_texts:
+                            game_info.append({
+                                'code': code_texts[data[0]],
+                                'x': float(data[1]),
+                                'y': float(data[2]),
+                                'width': float(data[3]),
+                                'height': float(data[4]),
+                                'confidence': float(data[5]),
+                                'timestamp': float(data[6]),
+                            })
+            else:
+                logger.error(f'File not found: {text_file_path}')
+                # クライアントにエラーメッセージを送信することも考慮できます
+                game_info.append({'error': 'ファイルが見つかりません。'})
+
+        except Exception as e:
+            logger.exception('Error reading the game info file.')
+            game_info.append({'error': 'ゲーム情報の読み込み中にエラーが発生しました。'})
+
+        
         await self.send(text_data=json.dumps({
             # 'response': f'Received your message: {text_data}'
-            "response" : text_data
+            "response" : game_info
         }))
        
     
