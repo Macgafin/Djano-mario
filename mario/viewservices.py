@@ -26,6 +26,15 @@ def process_game_info(game_info, current_time):
                 if 'Kuribo' in element['code'] or 'Nokonoko' in element['code']:
                     collision_message = "クリボーにぶつかって死んでいるので５秒前に戻ってやり直してください"
                     break
+                elif 'Hammer' in element['code']:
+                    collision_message = "ハンマーブロスのハンマーにあたったのでタイミングを見て下をくぐってみてください"
+                    break
+                elif 'Fireball' in element['code']:
+                    collision_message = "ファイアボールに当たったのでジャンプして避けてください"
+                    break
+                elif 'Piranha Plant' in element['code']:
+                    collision_message = "パックンフラワーに近づきすぎたので気をつけてください"
+                    break
                 elif hatena_block_time is not None:
                     if 'small Mario' not in mario['code']:
                         if current_time - hatena_block_time <= 5:
