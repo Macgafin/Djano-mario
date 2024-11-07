@@ -12,6 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 import asyncio
 import logging
 from channels.layers import get_channel_layer
+from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 
 # ロガーを設定
 logger = logging.getLogger(__name__)
@@ -94,7 +96,9 @@ async def home(request):
         'video_file_path': video_file_path,
     })
 
-# 非同期ストリーミングビュー
+#　パスなどのメモ一応残しとく
+# MEMO_PATH = os.path.join(settings.BASE_DIR, 'mainproject', 'mario', 'static', 'mario', 'memo.txt')
+# QUESTIONNAIRE_PATH = os.path.join(settings.BASE_DIR, 'mainproject', 'mario', 'static', 'mario', 'questionnaire.txt')
 @csrf_exempt
 async def stream_view(request):
     response = StreamingHttpResponse(video_stream(), content_type='multipart/x-mixed-replace; boundary=frame')
@@ -104,3 +108,22 @@ async def stream_view(request):
 def image_details(request):
     game_info = []  # ゲーム情報を格納するリスト
     return render(request, 'mario/image_details.html', {'game_info': game_info})
+
+@csrf_exempt
+def submit_feedback(request):
+    if request.method == 'POST':
+        feedback = request.POST.get('feedback', '')
+        if feedback:
+            # 'w' モードでファイルを開き、上書き保存
+            with open('mario/static/mario/memo.txt', 'w', encoding='utf-8') as file:
+                file.write(f"{feedback}\n")
+    return redirect('/')
+
+@csrf_exempt
+def submit_experience(request):
+    if request.method == 'POST':
+        experience = request.POST.get('experience', '')
+        if experience:
+            with open('mario/static/mario/questionnaire.txt', 'a', encoding='utf-8') as file:
+                file.write(f"{experience}\n")
+    return redirect('/')
