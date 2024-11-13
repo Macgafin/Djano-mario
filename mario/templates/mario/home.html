@@ -22,7 +22,6 @@
         
         .outer-container {
             margin: 30px;
-            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -89,27 +88,28 @@
 
             <!-- スクリプト -->
             <div class="box" id="script">
-                <h3>スクリプト</h3>
+                <h3>フィードバック欄</h3>
                 <p>フィードバック： {{ scripts }}</p>
                 <a href="{% url 'image_details' %}" class="btn btn-primary">詳細を見る</a>
             </div>
 
             <!-- フィードバックとシステムの使用感を入力するフォーム -->
             <div class="box" id="feedback">
-                <h3>フィードバック</h3>
+                <h3>アンケート＆メモ欄</h3>
                 <form action="/submit_feedback" method="POST">
                     <div class="form-group">
-                        <label for="feedback_input">改善案を入力してください:</label>
+                        <label for="feedback_input">フィードバックのメモ記入欄:</label>
                         <textarea class="form-control" id="feedback_input" name="feedback"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">送信</button>
                 </form>
-                <h3>システムの使用感</h3>
+                <h3>アンケート</h3>
                 <form action="/submit_experience" method="POST">
                     <div class="form-group">
-                        <label for="experience_input">システムの使用感を入力してください:</label>
+                        <label for="experience_input">付随のアンケート説明を見ながら記入してください:</label>
                         <textarea class="form-control" id="experience_input" name="experience"></textarea>
                     </div>
+                    <a href="{% url 'questionnaire' %}" class="btn btn-info">アンケートに回答する</a>
                     <button type="submit" class="btn btn-primary">送信</button>
                 </form>
             </div>
@@ -127,23 +127,36 @@
         };
     
         // WebSocketでメッセージを受信したときの処理
-        gameInfoSocket.onmessage = function(event) {
-            console.log(event.data);
-            const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
-            console.log(data);
-            console.log(data.response);
-        
-            const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
-            gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
-        
-            // 受信したゲーム情報を新しいリストアイテムとして追加
-            data.response.forEach(function(info) {
-                const listItem = document.createElement('li');
-                listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
-                listItem.textContent = `コード: ${info.code}, x: ${info.x}, y: ${info.y}, 幅: ${info.width}, 高さ: ${info.height}, 信頼度: ${info.confidence.toFixed(2)}`;  // 受信した情報を表示
-                gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
-            }); 
-        };
+        // WebSocketでメッセージを受信したときの処理
+gameInfoSocket.onmessage = function(event) {
+    console.log(event.data);
+    const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
+    console.log(data);
+    console.log(data.response);
+
+    const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
+    gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
+
+    // 受信したゲーム情報を新しいリストアイテムとして追加
+    data.response.forEach(function(info) {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
+
+        // 必要な情報のみをシンプルに表示
+        const code = info.code || '不明';  // 'code'が無い場合は '不明' と表示
+        const x = Math.round(info.x);  // 座標xを丸める
+        const y = Math.round(info.y);  // 座標yを丸める
+        const width = Math.round(info.width);  // 幅を丸める
+        const height = Math.round(info.height);  // 高さを丸める
+        const confidence = info.confidence.toFixed(2);  // 信頼度は小数点以下2桁にフォーマット
+
+        // フォーマットされたテキストをリストアイテムに追加
+        listItem.textContent = `${code} - x: ${x}, y: ${y}, 幅: ${width}, 高さ: ${height}, 信頼度: ${confidence}`;
+
+        gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
+    });
+};
+
         
         const intervalID = setInterval(() => {
             gameInfoSocket.send({

@@ -1,5 +1,5 @@
 from django.urls import path
-from mario.consumers import GameInfoConsumer
+from .consumers import GameInfoConsumer
 
 
 websocket_urlpatterns = [

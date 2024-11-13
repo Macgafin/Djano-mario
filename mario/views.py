@@ -14,6 +14,8 @@ import logging
 from channels.layers import get_channel_layer
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
+from .forms import QuestionnaireForm
 
 # ロガーを設定
 logger = logging.getLogger(__name__)
@@ -109,13 +111,29 @@ def image_details(request):
     game_info = []  # ゲーム情報を格納するリスト
     return render(request, 'mario/image_details.html', {'game_info': game_info})
 
+async def questionnaire(request):
+    if request.method == 'POST':
+        form = QuestionnaireForm(request.POST)
+        if form.is_valid():
+            async with aiofiles.open('mainproject/mario/static/mario/questionnaire.txt', 'a') as f:
+                await f.write("システム利用しての総合評価: " + form.cleaned_data['rating_experience'] + "\n")
+                await f.write("システムの使いやすさ: " + form.cleaned_data['rating_usability'] + "\n")
+                await f.write("作業効率への効果: " + form.cleaned_data['rating_efficiency'] + "\n")
+                await f.write("システム利用時と未使用時の違い: " + form.cleaned_data['rating_comparison'] + "\n")
+                await f.write("システム利用の感想: " + form.cleaned_data['feedback'] + "\n")
+                await f.write("改善点: " + form.cleaned_data['suggestions'] + "\n\n")
+            return redirect('home')  # 送信後にホームページへリダイレクト
+    else:
+        form = QuestionnaireForm()
+    return render(request, 'mario/questionnaire.html', {'form': form})
+
 @csrf_exempt
 def submit_feedback(request):
     if request.method == 'POST':
         feedback = request.POST.get('feedback', '')
         if feedback:
             # 'w' モードでファイルを開き、上書き保存
-            with open('mario/static/mario/memo.txt', 'w', encoding='utf-8') as file:
+            with open('mario/static/mario/memo.txt', 'a', encoding='utf-8') as file:
                 file.write(f"{feedback}\n")
     return redirect('/')
 
