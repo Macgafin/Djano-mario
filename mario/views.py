@@ -85,10 +85,31 @@ async def home(request):
         logger.error(f"Error sending message: {e}")
         
         
+        
     # 現在時刻を記録
     current_time = time.time()
     # サービス層の関数を呼び出す
     scripts = process_game_info(game_info, current_time)
+    
+    print("start print collision message")
+    print(scripts)  # game_infoの内容を確認
+    print("end print collision message")
+    print("----------------------------------------")
+    
+     # collision_messageをWebSocket経由で送信
+    try:
+        logger.info("Sending collision message to WebSocket")
+        await channel_layer.group_send(
+            'game_info',
+            {
+                'type': 'send_collision_message',  # WebSocketでの処理を指定
+                'message': scripts
+            }
+        )
+        logger.info("Game info sent successfully")
+    except Exception as e:
+        logger.error(f"Error sending collision message: {e}")
+
 
     return render(request, "mario/home.html", {
         'clear_values': clear_values,
@@ -115,7 +136,7 @@ async def questionnaire(request):
     if request.method == 'POST':
         form = QuestionnaireForm(request.POST)
         if form.is_valid():
-            async with aiofiles.open('mainproject/mario/static/mario/questionnaire.txt', 'a') as f:
+            async with aiofiles.open('mario/static/mario/questionnaire.txt', 'a') as f:
                 await f.write("システム利用しての総合評価: " + form.cleaned_data['rating_experience'] + "\n")
                 await f.write("システムの使いやすさ: " + form.cleaned_data['rating_usability'] + "\n")
                 await f.write("作業効率への効果: " + form.cleaned_data['rating_efficiency'] + "\n")

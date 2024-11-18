@@ -60,6 +60,13 @@
         .list-group-item:nth-child(odd) {
             background-color: #f8f9fa;
         }
+
+        /* スクロール機能を追加するためのスタイル */
+        #game-info {
+            max-height: 300px; /* 最大高さを設定 */
+            overflow-y: auto; /* 内容が枠を超える場合に縦方向にスクロール */
+            padding-right: 10px; /* 右側に少し余白を追加してスクロールバーを見やすく */
+        }
         
         @media (min-width: 768px) {
             .container {
@@ -90,6 +97,7 @@
             <div class="box" id="script">
                 <h3>フィードバック欄</h3>
                 <p>フィードバック： {{ scripts }}</p>
+                <p id="collision-message">ここにwebsocket通信のメッセージが表示されます。</p>
                 <a href="{% url 'image_details' %}" class="btn btn-primary">詳細を見る</a>
             </div>
 
@@ -127,35 +135,50 @@
         };
     
         // WebSocketでメッセージを受信したときの処理
-        // WebSocketでメッセージを受信したときの処理
-gameInfoSocket.onmessage = function(event) {
-    console.log(event.data);
-    const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
-    console.log(data);
-    console.log(data.response);
+        gameInfoSocket.onmessage = function(event) {
+            console.log(event.data);
+            const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
+            console.log(data);
 
-    const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
-    gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
+            // フィードバック欄の更新
+            const feedbackElement = document.querySelector("#script p:first-of-type"); // フィードバック欄を取得
+            if (feedbackElement) {
+                feedbackElement.textContent = `フィードバック：${data.collision_message || 'メッセージがありません'}`;
+            } else {
+                console.error("フィードバック欄の要素が見つかりません");
+            }
 
-    // 受信したゲーム情報を新しいリストアイテムとして追加
-    data.response.forEach(function(info) {
-        const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
+            // Collision messageの更新
+            const collisionMessageElement = document.getElementById('collision-message');
+            if (collisionMessageElement) {
+                collisionMessageElement.textContent = data.collision_message || 'メッセージがありません';
+            } else {
+                console.error("'collision-message' 要素が見つかりません");
+            }
 
-        // 必要な情報のみをシンプルに表示
-        const code = info.code || '不明';  // 'code'が無い場合は '不明' と表示
-        const x = Math.round(info.x);  // 座標xを丸める
-        const y = Math.round(info.y);  // 座標yを丸める
-        const width = Math.round(info.width);  // 幅を丸める
-        const height = Math.round(info.height);  // 高さを丸める
-        const confidence = info.confidence.toFixed(2);  // 信頼度は小数点以下2桁にフォーマット
+            const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
+            gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
 
-        // フォーマットされたテキストをリストアイテムに追加
-        listItem.textContent = `${code} - x: ${x}, y: ${y}, 幅: ${width}, 高さ: ${height}, 信頼度: ${confidence}`;
+            // 受信したゲーム情報を新しいリストアイテムとして追加
+            data.response.forEach(function(info) {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
 
-        gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
-    });
-};
+                // 必要な情報のみをシンプルに表示
+                const code = info.code || '不明';  // 'code'が無い場合は '不明' と表示
+                const x = Math.round(info.x);  // 座標xを丸める
+                const y = Math.round(info.y);  // 座標yを丸める
+                const width = Math.round(info.width);  // 幅を丸める
+                const height = Math.round(info.height);  // 高さを丸める
+                const confidence = info.confidence.toFixed(2);  // 信頼度は小数点以下2桁にフォーマット
+
+                // フォーマットされたテキストをリストアイテムに追加
+                listItem.textContent = `${code} - x: ${x}, y: ${y}, 幅: ${width}, 高さ: ${height}, 信頼度: ${confidence}`;
+
+                gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
+            });
+
+        };
 
         
         const intervalID = setInterval(() => {

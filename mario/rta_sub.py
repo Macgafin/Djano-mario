@@ -10,7 +10,7 @@ import asyncio
 import logging
 
 # モデルのパス
-model_path = Path(__file__).resolve().parent / 'static/mario/best.pt'
+model_path = Path(__file__).resolve().parent / 'static/mario/mario-nomal.pt'
 text_output_path = Path(__file__).resolve().parent / 'static/mario/realtime_analytics.txt'
 
 # ログレベルをWARNINGに設定することで、INFOレベルの出力を抑制
@@ -22,7 +22,7 @@ model = YOLO(model_path)
 # 非同期ストリーミング関数
 async def video_stream():
     # OBSの仮想カメラから映像をキャプチャ
-    cap = cv2.VideoCapture(2)  # 仮想カメラのIDが2と仮定
+    cap = cv2.VideoCapture(1)  # 仮想カメラのIDが2と仮定
 
     if not cap.isOpened():
         print("Error: カメラが開けませんでした")

@@ -1,10 +1,13 @@
+import asyncio
 import json
 from pathlib import Path
+import time
 import aiofiles
 from channels.generic.websocket import AsyncWebsocketConsumer
 import logging
 
 from django.conf import settings
+from .viewservices import process_game_info
 
 logger = logging.getLogger(__name__)
 
@@ -75,10 +78,18 @@ class GameInfoConsumer(AsyncWebsocketConsumer):
             logger.exception('Error reading the game info file.')
             game_info.append({'error': 'ゲーム情報の読み込み中にエラーが発生しました。'})
 
+            # `process_game_info`を呼び出して`collision_message`を取得
+        try:
+            current_time = time.time()
+            collision_message = await asyncio.to_thread(process_game_info, game_info, current_time)
+        except Exception as e:
+            logger.error(f"Error in process_game_info: {e}")
+            collision_message = []
         
         await self.send(text_data=json.dumps({
             # 'response': f'Received your message: {text_data}'
-            "response" : game_info
+            "response" : game_info,
+            "collision_message" : collision_message
         }))
        
     
@@ -93,3 +104,17 @@ class GameInfoConsumer(AsyncWebsocketConsumer):
             'game_info': game_info
         }))
         logger.info(f"Sending game info: {game_info}")
+        
+    
+    #""によってスクリプトを送るメソッド
+    async def send_collision_message(self, event):
+        print("collision message called")  # ここを追加
+        collision_message = event['message']
+        print(f"send_game_info called with: {collision_message}")  # 追加のデバッグ出力
+        
+        # WebSocketにメッセージを送信
+        await self.send(text_data=json.dumps({
+            'collision_message': collision_message
+        }))
+        logger.info(f"Sending game info: {collision_message}")
+    

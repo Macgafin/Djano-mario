@@ -19,7 +19,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+    
         .outer-container {
             margin: 30px;
             display: flex;
@@ -27,24 +27,28 @@
             align-items: center;
             justify-content: center;
         }
-
+    
         .container {
             max-width: 600px;
             width: 100%;
         }
-
+    
         .form-label {
             font-weight: bold;
+            display: block;
+            white-space: normal; /* テキストの折り返しを許可 */
+            word-wrap: break-word; /* 長い単語の折り返しを許可 */
         }
-        
+    
         .form-check-label {
             color: #17a2b8;
         }
-        
+    
         .btn-primary, .btn-info {
             width: 100%;
         }
     </style>
+    
 </head>
 <body>
 <div class="outer-container">
@@ -98,7 +102,7 @@
             </div>
 
             <!-- 送信ボタン -->
-            <button type="submit" class="btn btn-primary">送信</button>
+             <button type="submit" class="btn btn-primary">送信</button> 
         </form>
     </div>
 </div>
