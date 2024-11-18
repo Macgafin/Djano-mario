@@ -1,0 +1,1 @@
+/mario/static/mario/mario-nomal.pt filter=lfs diff=lfs merge=lfs -text
