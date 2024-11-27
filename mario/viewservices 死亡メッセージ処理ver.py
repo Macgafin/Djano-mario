@@ -51,7 +51,6 @@ def process_game_info(game_info, current_time):
     bros_y_coordinate = []  # ハンマーブロスの環境を格納するリスト
     mario_history = []  # マリオの位置履歴を格納
     collision_message = None
-
     # マリオの状態を特定し、他の要素をelementsに格納
     for element in game_info:   #間違えやすいが、ここのelementは格納されるelementsとは別のことである
         # マリオの状態を判定し、マリオの状態を設定
@@ -112,7 +111,6 @@ def process_game_info(game_info, current_time):
         no_mario = ""
         
     print("--------------------------------")
-    print("１回目")
     print(elements) #マリオ以外が格納されているはず
 
     # # 死亡2秒前のマリオの状態を取得
@@ -133,59 +131,56 @@ def process_game_info(game_info, current_time):
 
     # マリオの状態を元に衝突判定
     collision_detected = False  # 衝突が検出されたかどうかのフラグ
-    
-    # マリオの状態を元に衝突判定
-    if mario_state is not None:
-        for element in elements:
-            default_label = element["code"]
-            label = [line.split("：")[0].strip() for line in default_label.splitlines()] #じゃまなものを消す
-            
-            # 衝突判定の条件 マリオ
-            tolerance = 4  # 余裕を持たせる距離（ピクセル単位で調整）
+    for element in elements:
+        default_label = element["code"]
+        label = [line.split("：")[0].strip() for line in default_label.splitlines()] #じゃまなものを消す
+        
 
-            # マリオの矩形の左上隅と右下隅を計算
-            mario_left = mario_state["x"] - mario_state["width"] / 2
-            mario_right = mario_state["x"] + mario_state["width"] / 2
-            mario_top = mario_state["y"] + mario_state["height"] / 2
-            mario_bottom = mario_state["y"] - mario_state["height"] / 2
+        # 衝突判定の条件 マリオ
+        tolerance = 4  # 余裕を持たせる距離（ピクセル単位で調整）
 
-            # elementの矩形の左上隅と右下隅を計算
-            element_left = element["x"] - element["width"] / 2
-            element_right = element["x"] + element["width"] / 2
-            element_top = element["y"] + element["height"] / 2
-            element_bottom = element["y"] - element["height"] / 2
-            print("++++++++++++++++++++++")
-            print("2回目")
-            print(elements) #上記のelementと一致するかどうか
-            print("++++++++++++++++++++++")
+        # マリオの矩形の左上隅と右下隅を計算
+        mario_left = mario_state["x"] - mario_state["width"] / 2
+        mario_right = mario_state["x"] + mario_state["width"] / 2
+        mario_top = mario_state["y"] + mario_state["height"] / 2
+        mario_bottom = mario_state["y"] - mario_state["height"] / 2
 
-            # print(f"マリオ状態　{mario_state['state']}　マリオ右　{mario_right}　)マリオ左　{mario_left} マリオ上　{mario_top}マリオした {element_bottom}")
-            # print(f"element名　{element["code"]}　element右　{element_right}　element左　{element_left} element上　{element_top}　element下 {element_bottom}")
+        # elementの矩形の左上隅と右下隅を計算
+        element_left = element["x"] - element["width"] / 2
+        element_right = element["x"] + element["width"] / 2
+        element_top = element["y"] + element["height"] / 2
+        element_bottom = element["y"] - element["height"] / 2
+        print("++++++++++++++++++++++")
+        print(elements) #上記のelementと一致するかどうか
+        print("++++++++++++++++++++++")
 
-            if (
-                abs(mario_state["y"] - element["y"]) <= tolerance  # y座標がほぼ同じ
-                and (
-                    mario_right > element_left  # マリオの右端がelementの左端より右
-                    or mario_left < element_right
-                )  # マリオの左端がelementの右端より左
-            ) or (
-                abs(mario_state["x"] - element["x"]) <= tolerance  # x座標がほぼ同じ
-                and (
-                    mario_bottom > element_top  # マリオの下端がelementの上端より下
-                    or mario_top < element_bottom
-                )  # マリオの上端がelementの下端より上
-            ):
-                collision_detected = True  # 衝突を検出
-                
-                collision_message = generate_collision_message(
-                    label=label,
-                    mario_state=mario_state,
-                    environment=environment,
-                    bros_y_coordinate=bros_y_coordinate,
-                    current_time=current_time,
-                    hatena_block_time=hatena_block_time,
-                    no_mario = no_mario
-                )
+        # print(f"マリオ状態　{mario_state['state']}　マリオ右　{mario_right}　)マリオ左　{mario_left} マリオ上　{mario_top}マリオした {element_bottom}")
+        # print(f"element名　{element["code"]}　element右　{element_right}　element左　{element_left} element上　{element_top}　element下 {element_bottom}")
+
+        if (
+            abs(mario_state["y"] - element["y"]) <= tolerance  # y座標がほぼ同じ
+            and (
+                mario_right > element_left  # マリオの右端がelementの左端より右
+                or mario_left < element_right
+            )  # マリオの左端がelementの右端より左
+        ) or (
+            abs(mario_state["x"] - element["x"]) <= tolerance  # x座標がほぼ同じ
+            and (
+                mario_bottom > element_top  # マリオの下端がelementの上端より下
+                or mario_top < element_bottom
+            )  # マリオの上端がelementの下端より上
+        ):
+            collision_detected = True  # 衝突を検出
+
+            collision_message = generate_collision_message(
+                label=label,
+                mario_state=mario_state,
+                environment=environment,
+                bros_y_coordinate=bros_y_coordinate,
+                current_time=current_time,
+                hatena_block_time=hatena_block_time,
+                no_mario = no_mario
+            )
 
         # # 衝突時にdeath_messageを設定し、death_timeを現在時刻にセット
         # death_message = collision_message
@@ -377,4 +372,5 @@ def generate_collision_message(
                 "ちなみに10秒以内はてなブロックがありました、\n"
                 "今の状態で叩いてフラワーが入っていればファイヤーマリオに変身して、火を出せます。\n"
             )
+            
     return collision_message

@@ -133,29 +133,53 @@
         gameInfoSocket.onopen = function() {
             console.log('WebSocket connection established');
         };
+
+        // メッセージを表示した時間を保存する変数
+        let messageTimestamp = null;
+        let lastMessage = '';
+        let displayMessage = '';  // 表示するメッセージを格納する変数
     
         // WebSocketでメッセージを受信したときの処理
         gameInfoSocket.onmessage = function(event) {
             console.log(event.data);
             const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
-            console.log(data);
 
             // フィードバック欄の更新
             const feedbackElement = document.querySelector("#script p:first-of-type"); // フィードバック欄を取得
             if (feedbackElement) {
-                feedbackElement.textContent = `フィードバック：${data.collision_message || 'メッセージがありません'}`;
+                const currentTime = Date.now(); // 現在の時刻を取得
+
+                // collision_message が「問題なし」以外の場合、そのメッセージを表示
+                if (data.collision_message && data.collision_message !== '巻き戻し中！') {
+                    console.log("メッセージ変更");
+
+                    // 新しいメッセージの場合、表示時間をリセット
+                    if (data.collision_message !== lastMessage) {
+                        lastMessage = data.collision_message; // メッセージを更新
+                        displayMessage = lastMessage; // 表示メッセージにセット
+                        messageTimestamp = currentTime; // タイムスタンプを更新
+                    }
+                }
+                
+
+                // メッセージを保持
+                if (messageTimestamp && currentTime - messageTimestamp <= 5000) { 
+                    feedbackElement.textContent = `フィードバック：${displayMessage}`;
+                } else {
+                    //経過した場合、メッセージを消去
+                    if (displayMessage !== '') {
+                        feedbackElement.textContent = 'フィードバック：メッセージが空白です';
+                        displayMessage = ''; // メッセージリセット
+                        lastMessage = '';  // メッセージリセット
+                        messageTimestamp = null; // タイムスタンプをリセット
+                        console.log("メッセージ初期化");
+                    }
+                }
             } else {
                 console.error("フィードバック欄の要素が見つかりません");
             }
 
-            // Collision messageの更新
-            const collisionMessageElement = document.getElementById('collision-message');
-            if (collisionMessageElement) {
-                collisionMessageElement.textContent = data.collision_message || 'メッセージがありません';
-            } else {
-                console.error("'collision-message' 要素が見つかりません");
-            }
-
+            // ゲーム情報の更新処理
             const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
             gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
 
@@ -177,15 +201,14 @@
 
                 gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
             });
-
         };
 
+
         
-        const intervalID = setInterval(() => {
-            gameInfoSocket.send({
-            });
+         const intervalID = setInterval(() => {
+            gameInfoSocket.send({});
             console.log("send enmpty")
-        }, 1000);
+        }, 500);
     
         // WebSocketが予期せず閉じられたときのエラーハンドリング
         gameInfoSocket.onclose = function(e) {
