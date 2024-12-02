@@ -55,7 +55,7 @@ async def video_stream():
             # フレームをJPEG形式にエンコード（非同期対応）
             _, buffer = await asyncio.to_thread(cv2.imencode, '.jpg', frame)
 
-            # ストリーミング用にフレームを送信（ここは別途フレームを返す処理を実装する必要あり）
+            # ストリーミング用にフレームを送信
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
         else:

@@ -65,11 +65,6 @@ async def home(request):
 
     # WebSocketにゲーム情報を送信する
     channel_layer = get_channel_layer()
-    
-    
-    print("start print game_info")
-    print(game_info)  # game_infoの内容を確認
-    print("end print game_info")
 
     try:
         logger.info("Sending game_info to consumers.py")
@@ -90,11 +85,6 @@ async def home(request):
     current_time = time.time()
     # サービス層の関数を呼び出す
     scripts = process_game_info(game_info, current_time)
-    
-    print("start print collision message")
-    print(scripts)  # game_infoの内容を確認
-    print("end print collision message")
-    print("----------------------------------------")
     
      # collision_messageをWebSocket経由で送信
     try:

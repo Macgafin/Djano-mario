@@ -96,8 +96,7 @@
             <!-- スクリプト -->
             <div class="box" id="script">
                 <h3>フィードバック欄</h3>
-                <p>フィードバック： {{ scripts }}</p>
-                <p id="collision-message">ここにwebsocket通信のメッセージが表示されます。</p>
+                <p id="collision-message"></p>
                 <a href="{% url 'image_details' %}" class="btn btn-primary">詳細を見る</a>
             </div>
 
@@ -134,49 +133,52 @@
             console.log('WebSocket connection established');
         };
 
-        // メッセージを表示した時間を保存する変数
-        let messageTimestamp = null;
-        let lastMessage = '';
-        let displayMessage = '';  // 表示するメッセージを格納する変数
-    
+        // タイマーIDを保持する変数
+        let messageTimeout;
+        // 現状メッセージ
+        let currentMessage = "";  
+
         // WebSocketでメッセージを受信したときの処理
         gameInfoSocket.onmessage = function(event) {
             console.log(event.data);
             const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
 
-            // フィードバック欄の更新
-            const feedbackElement = document.querySelector("#script p:first-of-type"); // フィードバック欄を取得
-            if (feedbackElement) {
-                const currentTime = Date.now(); // 現在の時刻を取得
+            // collision_messageの取得
+            const collisionMessage = data.collision_message;
 
-                // collision_message が「問題なし」以外の場合、そのメッセージを表示
-                if (data.collision_message && data.collision_message !== '巻き戻し中！') {
-                    console.log("メッセージ変更");
+            // メッセージの表示要素
+            const collisionMessageElement = document.getElementById("collision-message");
 
-                    // 新しいメッセージの場合、表示時間をリセット
-                    if (data.collision_message !== lastMessage) {
-                        lastMessage = data.collision_message; // メッセージを更新
-                        displayMessage = lastMessage; // 表示メッセージにセット
-                        messageTimestamp = currentTime; // タイムスタンプを更新
+            // メッセージが変わった場合にのみ処理を行う
+            if (collisionMessage !== currentMessage) {
+                // メッセージが変わったので、現在のメッセージを更新
+                currentMessage = collisionMessage;
+
+                // 「巻き戻し中」や「問題なし」の場合は常に表示
+                if (collisionMessage === "巻き戻し中！" || collisionMessage === "問題なし") {
+                    collisionMessageElement.textContent = collisionMessage;
+
+                    // タイマーをクリア（次回のメッセージが変わるまで待機）
+                    if (messageTimeout) {
+                        clearTimeout(messageTimeout);
+                        messageTimeout = null;
                     }
-                }
-                
-
-                // メッセージを保持
-                if (messageTimestamp && currentTime - messageTimestamp <= 5000) { 
-                    feedbackElement.textContent = `フィードバック：${displayMessage}`;
                 } else {
-                    //経過した場合、メッセージを消去
-                    if (displayMessage !== '') {
-                        feedbackElement.textContent = 'フィードバック：メッセージが空白です';
-                        displayMessage = ''; // メッセージリセット
-                        lastMessage = '';  // メッセージリセット
-                        messageTimestamp = null; // タイムスタンプをリセット
-                        console.log("メッセージ初期化");
+                    // 他のメッセージの場合、表示し、5秒後に元に戻す
+
+                    // 新しいメッセージを表示
+                    collisionMessageElement.textContent = collisionMessage;
+
+                    // 既にタイマーがセットされていればそのまま（リセットしない）
+                    if (messageTimeout) {
+                        clearTimeout(messageTimeout);
                     }
+
+                    // 5秒後に元の状態に戻す
+                    messageTimeout = setTimeout(function() {
+                        collisionMessageElement.textContent = "";  // メッセージを消去
+                    }, 10000);  // 5000ミリ秒 = 5秒
                 }
-            } else {
-                console.error("フィードバック欄の要素が見つかりません");
             }
 
             // ゲーム情報の更新処理
@@ -197,7 +199,7 @@
                 const confidence = info.confidence.toFixed(2);  // 信頼度は小数点以下2桁にフォーマット
 
                 // フォーマットされたテキストをリストアイテムに追加
-                listItem.textContent = `${code} - x: ${x}, y: ${y}, 幅: ${width}, 高さ: ${height}, 信頼度: ${confidence}`;
+                listItem.textContent = `${code} x: ${x}, y: ${y}, 幅: ${width}, 高さ: ${height}, 信頼度: ${confidence}`;
 
                 gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
             });
@@ -205,7 +207,7 @@
 
 
         
-         const intervalID = setInterval(() => {
+        const intervalID = setInterval(() => {
             gameInfoSocket.send({});
             console.log("send enmpty")
         }, 500);
