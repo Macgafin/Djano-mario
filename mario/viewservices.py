@@ -130,8 +130,7 @@ def process_game_info(game_info, current_time):
             print("++++++++++++++++++++++")
             print(f"ｙ差：{mario_state["y"] - element["y"]}")
             print(f"ｘ差：{mario_state["x"] - element["x"]}")
-            print(f"マリオｘ：{mario_state['x']}　マリオｙ：{mario_state['y']}")
-            print(f"elemet x:{element["x"]}  element y: {element["y"]}")
+            print(f"空中の足場{environment}")
             print(f"マリオ状態　{mario_state['state']}　マリオ右　{mario_right}　,マリオ左　{mario_left} ,マリオ上　{mario_top}  ,マリオした {element_bottom}")
             print(f"element名　{label}　element右　{element_right}　,element左　{element_left} ,element上　{element_top}　,element下 {element_bottom}")
             print("++++++++++++++++++++++")
@@ -179,7 +178,7 @@ def process_game_info(game_info, current_time):
                 # ハンマーブロスにぶつかった場合
                 elif "Hummer Bros" in label:
                     if (
-                        mario_state["y"] < bros_y_coordinate["y"]
+                        mario_state["y"] < bros_y_coordinate[0]["y"]
                     ):  # マリオより上にブロスがいる時
                         collision_message = (
                             "ハンマーブロスのハンマーに当たって死亡しました！\n"
@@ -239,7 +238,7 @@ def process_game_info(game_info, current_time):
 
                 # トゲゾーにぶつかった場合
                 elif "Togezo" in label:
-                    if mario_state["y"] < environment["y"]:  # 空中に足場がある場合
+                    if mario_state["y"] < environment[0]["y"]:  # 空中に足場がある場合
                         collision_message = (
                             "トゲゾーにぶつかって死亡しました！\n"
                             "トゲゾーが空から降りてきた場合、周りの足場を確認してみましょう。\n"
@@ -255,9 +254,8 @@ def process_game_info(game_info, current_time):
                 # エレベーターで死亡した場合
                 elif "Elevator" in label:
                     collision_message = (
-                        "エレベーターで死亡しました！\n"
                         "エレベーターは不安定な足場なので、急がず落ち着いて移動しましょう。\n"
-                        "周りの足場を利用して、足元に気をつけて進んでください。5秒前に戻って再挑戦！"
+                        "落ちてしまったら，周りの足場を利用して、足元に気をつけて進んでください。5秒前に戻って再挑戦！"
                     )
 
                 # ノコノコに遭遇した場合
@@ -312,7 +310,7 @@ def process_game_info(game_info, current_time):
                         or "Big Mario" in mario_state["state"]
                     ):  # ファイヤーマリオかつビッグマリオ
                         if (
-                            mario_state["y"] < environment["y"]
+                            mario_state["y"] < environment[0]["y"]
                         ):  # マリオのy座標が足場より高い場合
                             collision_message = (
                                 "クッパに倒されました！\n"

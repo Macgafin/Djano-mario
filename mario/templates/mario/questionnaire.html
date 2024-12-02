@@ -29,26 +29,40 @@
         }
     
         .container {
-            max-width: 600px;
+            max-width: 800px;
             width: 100%;
         }
     
         .form-label {
             font-weight: bold;
             display: block;
-            white-space: normal; /* テキストの折り返しを許可 */
-            word-wrap: break-word; /* 長い単語の折り返しを許可 */
+            white-space: normal;
+            word-wrap: break-word;
         }
-    
+
         .form-check-label {
             color: #17a2b8;
         }
-    
-        .btn-primary, .btn-info {
+
+        .btn-primary {
             width: 100%;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .form-check-inline {
+            margin-right: 15px;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.5rem;
         }
     </style>
-    
 </head>
 <body>
 <div class="outer-container">
@@ -88,48 +102,57 @@
                     {{ form.rating_comparison }}
                 </div>
             </div>
+
+            <!-- その他のフィードバック項目 -->
             <div class="mb-3">
                 <label class="form-label">{{ form.rating_sougou.label }}</label>
                 <div class="form-check form-check-inline">
                     {{ form.rating_sougou }}
                 </div>
             </div>
+
             <div class="mb-3">
-                <label class="form-label">{{ form.rating_jyoukou.label }}</label>
+                <label class="form-label">{{ form.rating_jyoukyou.label }}</label>
                 <div class="form-check form-check-inline">
                     {{ form.rating_jyoukyou }}
                 </div>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">{{ form.rating_approach.label }}</label>
                 <div class="form-check form-check-inline">
                     {{ form.rating_approach }}
                 </div>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">{{ form.rating_jyoutatu.label }}</label>
                 <div class="form-check form-check-inline">
                     {{ form.rating_jyoutatu }}
                 </div>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">{{ form.rating_moura.label }}</label>
                 <div class="form-check form-check-inline">
-                    {{ form.rating_moura}}
+                    {{ form.rating_moura }}
                 </div>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">{{ form.rating_mae.label }}</label>
                 <div class="form-check form-check-inline">
                     {{ form.rating_mae }}
                 </div>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">{{ form.rating_ato.label }}</label>
                 <div class="form-check form-check-inline">
                     {{ form.rating_ato }}
                 </div>
             </div>
+
             <!-- システム利用の感想 -->
             <div class="mb-3">
                 <label class="form-label">{{ form.feedback.label }}</label>
@@ -143,7 +166,7 @@
             </div>
 
             <!-- 送信ボタン -->
-             <button type="submit" class="btn btn-primary">送信</button> 
+            <button type="submit" class="btn btn-primary">送信</button>
         </form>
     </div>
 </div>

@@ -147,8 +147,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
-
 CODE_TEXTS = {
     '0': 'Small Mario ：',
     '1': 'Big Mario ：',

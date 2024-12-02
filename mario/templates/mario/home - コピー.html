@@ -1,0 +1,226 @@
+{% load static %}
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>マリオ対策システム</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        .box {
+            padding: 20px;
+            background-color: white;
+            color: #17a2b8;
+            border: 2px solid #17a2b8;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .outer-container {
+            margin: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .ratio {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 aspect ratio */
+        }
+
+        .ratio video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .list-group-item {
+            border: none;
+            padding: 10px;
+            color: #17a2b8; /* テキストカラー変更 */
+        }
+
+        .list-group-item:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+
+        /* スクロール機能を追加するためのスタイル */
+        #game-info {
+            max-height: 300px; /* 最大高さを設定 */
+            overflow-y: auto; /* 内容が枠を超える場合に縦方向にスクロール */
+            padding-right: 10px; /* 右側に少し余白を追加してスクロールバーを見やすく */
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 2fr 1fr;
+                grid-template-rows: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="outer-container">
+        <div class="container">
+            <!-- ビデオ関連 -->
+                <div class="box" id="play-video">
+                    <div class="ratio">
+                        <img src="{% url 'video_stream' %}" alt="Stream">
+                    </div>
+                </div>
+
+            <!-- ゲーム情報 -->
+            <div class="box" id="clear-values">
+                <h3>ゲーム情報</h3>
+                <ul class="list-group" id="game-info"></ul>
+            </div>
+
+            <!-- スクリプト -->
+            <div class="box" id="script">
+                <h3>フィードバック欄</h3>
+                <p id="collision-message"></p>
+                <a href="{% url 'image_details' %}" class="btn btn-primary">詳細を見る</a>
+            </div>
+
+            <!-- フィードバックとシステムの使用感を入力するフォーム -->
+            <div class="box" id="feedback">
+                <h3>アンケート＆メモ欄</h3>
+                <form action="/submit_feedback" method="POST">
+                    <div class="form-group">
+                        <label for="feedback_input">フィードバックのメモ記入欄:</label>
+                        <textarea class="form-control" id="feedback_input" name="feedback"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">送信</button>
+                </form>
+                <h3>アンケート</h3>
+                <form action="/submit_experience" method="POST">
+                    <div class="form-group">
+                        <label for="experience_input">付随のアンケート説明を見ながら記入してください:</label>
+                        <textarea class="form-control" id="experience_input" name="experience"></textarea>
+                    </div>
+                    <a href="{% url 'questionnaire' %}" class="btn btn-info">アンケートに回答する</a>
+                    <button type="submit" class="btn btn-primary">送信</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // WebSocketの接続を作成
+        const gameInfoSocket = new WebSocket('ws://localhost:8000/ws/game-info/');
+
+
+        // WebSocketが接続されたときの処理
+        gameInfoSocket.onopen = function() {
+            console.log('WebSocket connection established');
+        };
+
+        let isMessageDisplayed = false;  // メッセージが表示中かどうかのフラグ
+        let lastMessageTime = 0;  // 最後にメッセージが表示された時間
+        let ignoreNextMessages = false;  // 次のメッセージを無視するかどうかのフラグ
+
+        // WebSocketでメッセージを受信したときの処理
+        gameInfoSocket.onmessage = function(event) {
+            console.log(event.data);
+            const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
+
+            // collision_messageの取得
+            const collisionMessage = data.collision_message;
+
+            // メッセージの表示要素
+            const collisionMessageElement = document.getElementById("collision-message");
+
+            // メッセージが "巻き戻し中！" または "問題なし" の場合
+            if (collisionMessage === "巻き戻し中！" || collisionMessage === "問題なし") {
+                // メッセージを表示
+                document.getElementById("collision-message").textContent = collisionMessage;
+                isMessageDisplayed = true;
+                lastMessageTime = Date.now();  // メッセージが表示された時間を記録
+                ignoreNextMessages = false;  // 次のメッセージは無視しない
+            } else if (!isMessageDisplayed || (Date.now() - lastMessageTime) > 5000) {
+                // メッセージが表示されていない、または表示されてから5秒以上経過していた場合
+                // 5秒間表示し続ける処理
+                if (!ignoreNextMessages) {
+                    document.getElementById("collision-message").textContent = collisionMessage;
+                    isMessageDisplayed = true;
+                    lastMessageTime = Date.now();  // メッセージが表示された時間を記録
+                    ignoreNextMessages = true;  // 次のメッセージを無視するフラグを設定
+
+                    // 5秒後にメッセージをクリア
+                    setTimeout(() => {
+                        document.getElementById("collision-message").textContent = "";
+                        isMessageDisplayed = false;
+                        ignoreNextMessages = false;  // 次のメッセージを受け入れる
+                    }, 5000);
+                }
+            }
+
+            // ゲーム情報の更新処理
+            const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
+            gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
+
+            // 受信したゲーム情報を新しいリストアイテムとして追加
+            data.response.forEach(function(info) {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');  // Bootstrapのクラスを適用
+
+                // 必要な情報のみをシンプルに表示
+                const code = info.code || '不明';  // 'code'が無い場合は '不明' と表示
+                const x = Math.round(info.x);  // 座標xを丸める
+                const y = Math.round(info.y);  // 座標yを丸める
+                const width = Math.round(info.width);  // 幅を丸める
+                const height = Math.round(info.height);  // 高さを丸める
+                const confidence = info.confidence.toFixed(2);  // 信頼度は小数点以下2桁にフォーマット
+
+                // フォーマットされたテキストをリストアイテムに追加
+                listItem.textContent = `${code} x: ${x}, y: ${y}, 幅: ${width}, 高さ: ${height}, 信頼度: ${confidence}`;
+
+                gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
+            });
+        };
+
+
+        
+        const intervalID = setInterval(() => {
+            gameInfoSocket.send({});
+            console.log("send enmpty")
+        }, 500);
+    
+        // WebSocketが予期せず閉じられたときのエラーハンドリング
+        gameInfoSocket.onclose = function(e) {
+            console.log('WebSocket closed unexpectedly');
+            clearInterval(intervalID);
+        };
+
+        // WebSocketのエラーハンドリング
+        gameInfoSocket.onerror = function(e) {
+            console.log('WebSocket error:', e);
+        };
+
+        
+        
+        
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+</body>
+
+</html>
