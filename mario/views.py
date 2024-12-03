@@ -17,98 +17,92 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from .forms import QuestionnaireForm
 
+
 # ロガーを設定
 logger = logging.getLogger(__name__)
 
-
-# ホームビューを非同期化
-async def home(request):
-    clear_values = await asyncio.to_thread(ClearValue.objects.all)
-    scripts = await asyncio.to_thread(Script.objects.all)
-    ourfeedbacks = await asyncio.to_thread(OurFeedback.objects.all)
-
-    # 動画ファイルパス
-    video_file_path = os.path.join(
-        settings.STATIC_URL, "mario_django/mainproject/mario/realtime_detection.mp4"
-    )
-
-    # ゲーム情報
+# ゲーム情報ファイルを非同期で読み込む
+async def read_game_info_file(file_path, code_texts):
     game_info = []
-
-    # 設定からコードとテキストのマッピングを取得
-    code_texts = settings.CODE_TEXTS
-
-    # 読み込むテキストファイルのパスを設定
-    text_file_path = (
-        Path(settings.BASE_DIR)
-        / "mario"
-        / "static"
-        / "mario"
-        / "realtime_analytics.txt"
-    )
-
-    # 非同期でファイルの読み込みを行う
     try:
-        if text_file_path.exists():
-            async with aiofiles.open(text_file_path, "r") as file:
+        if file_path.exists():
+            async with aiofiles.open(file_path, "r") as file:
                 async for line in file:
                     data = line.strip().split()
                     if len(data) >= 6 and data[0] in code_texts:
-                        game_info.append(
-                            {
-                                "code": code_texts[data[0]],
-                                "x": float(data[1]),
-                                "y": float(data[2]),
-                                "width": float(data[3]),
-                                "height": float(data[4]),
-                                "confidence": float(data[5]),
-                                "timestamp": float(data[6]),
-                            }
-                        )
+                        game_info.append({
+                            "code": code_texts[data[0]],
+                            "x": float(data[1]),
+                            "y": float(data[2]),
+                            "width": float(data[3]),
+                            "height": float(data[4]),
+                            "confidence": float(data[5]),
+                            "timestamp": float(data[6]),
+                        })
         else:
-            logger.error(f"File not found: {text_file_path}")
-            # クライアントにエラーメッセージを送信することも考慮できます
+            logger.error(f"File not found: {file_path}")
             game_info.append({"error": "ファイルが見つかりません。"})
-
     except Exception as e:
         logger.exception("Error reading the game info file.")
         game_info.append({"error": "ゲーム情報の読み込み中にエラーが発生しました。"})
 
-    # WebSocketにゲーム情報を送信する
-    channel_layer = get_channel_layer()
+    return game_info
 
+# フィードバックを非同期でファイルに書き込む
+async def write_feedback_to_file(feedback_message):
+    feedback_file_path = Path(settings.BASE_DIR) / "mario" / "static" / "mario" / "feedback.txt"
     try:
-        logger.info("Sending game_info to consumers.py")
+        async with aiofiles.open(feedback_file_path, "w", encoding="utf-8") as file:
+            await file.write(f"{feedback_message}\n")
+        logger.info("Feedback written to feedback.txt")
+    except Exception as e:
+        logger.error(f"Error writing to feedback.txt: {e}")
+
+# WebSocketメッセージを送信する
+async def send_message_to_websocket(channel_layer, message_type, message):
+    try:
         await channel_layer.group_send(
             "game_info",
             {
-                "type": "send_game_info",  # receiveメソッドで処理するために'type'を指定
-                "message": game_info,
+                "type": message_type,
+                "message": message,
             },
         )
-        logger.info("Game info sent successfully")
+        logger.info(f"Message '{message_type}' sent successfully")
     except Exception as e:
         logger.error(f"Error sending message: {e}")
 
-    # 現在時刻を記録
+# ホームビューを非同期化
+async def home(request):
+    # 非同期でデータベースとゲーム情報ファイルを読み込む
+    clear_values = await asyncio.to_thread(ClearValue.objects.all)
+    scripts = await asyncio.to_thread(Script.objects.all)
+    ourfeedbacks = await asyncio.to_thread(OurFeedback.objects.all)
+    
+    #設定のcode_textsを読み込み
+    code_texts = settings.CODE_TEXTS
+    text_file_path = Path(settings.BASE_DIR) / "mario" / "static" / "mario" / "realtime_analytics.txt"
+    
+    # WebSocketにゲーム情報を送信
+    game_info = await read_game_info_file(text_file_path, code_texts)
+    channel_layer = get_channel_layer()
+    await send_message_to_websocket(channel_layer, "send_game_info", game_info)
+
+    # ゲーム情報を処理してフィードバックを生成
     current_time = time.time()
-    # サービス層の関数を呼び出す
+    feedback_message = None
     scripts = process_game_info(game_info, current_time)
 
-    # collision_messageをWebSocket経由で送信
-    try:
-        logger.info("Sending collision message to WebSocket")
-        await channel_layer.group_send(
-            "game_info",
-            {
-                "type": "send_collision_message",  # WebSocketでの処理を指定
-                "message": scripts,
-            },
-        )
-        logger.info("Game info sent successfully")
-    except Exception as e:
-        logger.error(f"Error sending collision message: {e}")
+    # フィードバックが「巻き戻し中！」や「問題なし」でない場合にファイルに書き込む
+    if scripts and scripts not in ["巻き戻し中！", "問題なし"]:
+        feedback_message = scripts
+        #関数を呼び出してfeedback.txtに書き込む
+        await write_feedback_to_file(feedback_message)
 
+    # collision_messageをWebSocket経由で送信
+    await send_message_to_websocket(channel_layer, "send_collision_message", feedback_message)
+
+    # レンダリングしてレスポンスを返す
     return render(
         request,
         "mario/home.html",
@@ -117,7 +111,7 @@ async def home(request):
             "scripts": scripts,
             "ourfeedbacks": ourfeedbacks,
             "game_info": game_info,
-            "video_file_path": video_file_path,
+            "video_file_path": os.path.join(settings.STATIC_URL, "mario_django/mainproject/mario/realtime_detection.mp4"),
         },
     )
 
@@ -144,33 +138,29 @@ def questionnaire(request):
     if request.method == "POST":
         form = QuestionnaireForm(request.POST)
         if form.is_valid():
-            # 同期的にファイルを書き込む
-            with open(
-                "mario/static/mario/questionnaire.txt", "a", encoding="utf-8"
-            ) as f:
-                f.write(
-                    "システム利用しての総合評価: "
-                    + form.cleaned_data["rating_experience"]
-                    + "\n"
-                )
-                f.write(
-                    "システムの使いやすさ: "
-                    + form.cleaned_data["rating_usability"]
-                    + "\n"
-                )
-                f.write(
-                    "作業効率への効果: " + form.cleaned_data["rating_efficiency"] + "\n"
-                )
-                f.write(
-                    "システム利用時と未使用時の違い: "
-                    + form.cleaned_data["rating_comparison"]
-                    + "\n"
-                )
-                f.write("システム利用の感想: " + form.cleaned_data["feedback"] + "\n")
-                f.write("改善点: " + form.cleaned_data["suggestions"] + "\n\n")
-            return redirect("home")  # 送信後にホームページへリダイレクト
+            # 同期的にファイルに書き込む
+            with open("mario/static/mario/questionnaire.txt", "a", encoding="utf-8") as f:
+                f.write("ゲーム進行のスムーズさ: {}\n".format(form.cleaned_data["game_progression"]))
+                f.write("フィードバックの有用性: {}\n".format(form.cleaned_data["feedback_usefulness"]))
+                f.write("学習効果: {}\n".format(form.cleaned_data["learning_effect"]))
+                f.write("進捗効果: {}\n".format(form.cleaned_data["learning_progress"]))
+                f.write("組み合わせ: {}\n".format(form.cleaned_data["learning_combination"]))
+                f.write("システムの使いやすさ: {}\n".format(form.cleaned_data["system_usability"]))
+                f.write("システム利用しての総合評価: {}\n".format(form.cleaned_data["overall_experience"]))
+                f.write("発展性評価: {}\n".format(form.cleaned_data["System_Development"]))
+                f.write("システム前の状態: {}\n".format(form.cleaned_data["pre_system_feedback"]))
+                f.write("システム利用後の状態: {}\n".format(form.cleaned_data["post_system_feedback"]))
+                f.write("システム利用の感想: {}\n".format(form.cleaned_data["feedback"]))
+                f.write("改善点: {}\n".format(form.cleaned_data["suggestions"]))
+                f.write("-" * 40 + "\n")  # 区切り線
+
+            # フォームをリセットして確認メッセージを表示
+            form = QuestionnaireForm()  # 空のフォームを再生成
+            return render(request, "mario/home.html", {"form": form})  # 送信後にThank youページを表示
+
     else:
         form = QuestionnaireForm()
+
     return render(request, "mario/questionnaire.html", {"form": form})
 
 

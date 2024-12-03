@@ -131,60 +131,27 @@
         // WebSocketが接続されたときの処理
         gameInfoSocket.onopen = function() {
             console.log('WebSocket connection established');
-        };
+        }; 
 
-        // タイマーIDを保持する変数
-        let messageTimeout;
-        // 現状メッセージ
-        let currentMessage = "";  
-
-        // WebSocketでメッセージを受信したときの処理
+        // 実際の動作
         gameInfoSocket.onmessage = function(event) {
             console.log(event.data);
             const data = JSON.parse(event.data);  // JSONをパースしてオブジェクトに変換
-
+    
             // collision_messageの取得
             const collisionMessage = data.collision_message;
-
+    
             // メッセージの表示要素
-            const collisionMessageElement = document.getElementById("collision-message");
+            const collisionMessageElement = document.getElementById("collision-message");    
 
-            // メッセージが変わった場合にのみ処理を行う
-            if (collisionMessage !== currentMessage) {
-                // メッセージが変わったので、現在のメッセージを更新
-                currentMessage = collisionMessage;
-
-                // 「巻き戻し中」や「問題なし」の場合は常に表示
-                if (collisionMessage === "巻き戻し中！" || collisionMessage === "問題なし") {
-                    collisionMessageElement.textContent = collisionMessage;
-
-                    // タイマーをクリア（次回のメッセージが変わるまで待機）
-                    if (messageTimeout) {
-                        clearTimeout(messageTimeout);
-                        messageTimeout = null;
-                    }
-                } else {
-                    // 他のメッセージの場合、表示し、5秒後に元に戻す
-
-                    // 新しいメッセージを表示
-                    collisionMessageElement.textContent = collisionMessage;
-
-                    // 既にタイマーがセットされていればそのまま（リセットしない）
-                    if (messageTimeout) {
-                        clearTimeout(messageTimeout);
-                    }
-
-                    // 5秒後に元の状態に戻す
-                    messageTimeout = setTimeout(function() {
-                        collisionMessageElement.textContent = "";  // メッセージを消去
-                    }, 10000);  // 5000ミリ秒 = 5秒
-                }
-            }
-
+            // collision_messageを表示
+            collisionMessageElement.textContent = collisionMessage;
+            
+    
             // ゲーム情報の更新処理
             const gameInfoList = document.getElementById('game-info');  // ulタグの要素を取得
             gameInfoList.innerHTML = '';  // 既存のリストの中身をクリア
-
+    
             // 受信したゲーム情報を新しいリストアイテムとして追加
             data.response.forEach(function(info) {
                 const listItem = document.createElement('li');
