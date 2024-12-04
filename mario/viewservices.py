@@ -96,8 +96,6 @@ def process_game_info(game_info, current_time):
         collision_message = "巻き戻し中！"
 
     print("--------------------------------")
-    print(elements)
-    print(mario_state)
 
     # マリオの状態を元に衝突判定　まあこれ自体別で一個関数つくってもいいしね
     if mario_state is not None:
@@ -126,14 +124,6 @@ def process_game_info(game_info, current_time):
             element_right = element["x"] + element["width"] / 2
             element_top = element["y"] - element["height"] / 2
             element_bottom = element["y"] + element["height"] / 2
-            
-            print("++++++++++++++++++++++")
-            print(f"ｙ差：{mario_state["y"] - element["y"]}")
-            print(f"ｘ差：{mario_state["x"] - element["x"]}")
-            print(f"空中の足場{environment}")
-            print(f"マリオ状態　{mario_state['state']}　マリオ右　{mario_right}　,マリオ左　{mario_left} ,マリオ上　{mario_top}  ,マリオした {element_bottom}")
-            print(f"element名　{label}　element右　{element_right}　,element左　{element_left} ,element上　{element_top}　,element下 {element_bottom}")
-            print("++++++++++++++++++++++")
 
             # 衝突判定
             if (
@@ -157,8 +147,13 @@ def process_game_info(game_info, current_time):
                     )  
                 )
             ):
-
+                
                 print(f"衝突判定へ{label}")
+                print(f"ｙ差：{mario_state["y"] - element["y"]}，マリオｙ：{mario_state["y"]}　elementｙ：{element["y"]}")
+                print(f"ｘ差：{mario_state["x"] - element["x"]}，マリオｘ：{mario_state["x"]}　elementｘ：{element["x"]}")
+                print(f"空中の足場{environment}")
+                print(f"マリオ状態　{mario_state['state']}　マリオ右　{mario_right}　,マリオ左　{mario_left} ,マリオ上　{mario_top}  ,マリオした {element_bottom}")
+                print(f"element名　{label}　element右　{element_right}　,element左　{element_left} ,element上　{element_top}　,element下 {element_bottom}")
 
                 # 衝突メッセージの設定
                 if "Kuribo" in label or "Kinoko" in label:

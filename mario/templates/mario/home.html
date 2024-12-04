@@ -113,7 +113,7 @@
                 <h3>アンケート</h3>
                 <form action="/submit_experience" method="POST">
                     <div class="form-group">
-                        <label for="experience_input">付随のアンケート説明を見ながら記入してください:</label>
+                        <label for="experience_input">前半の１５分を経ての振り返りを記入してください:</label>
                         <textarea class="form-control" id="experience_input" name="experience"></textarea>
                     </div>
                     <a href="{% url 'questionnaire' %}" class="btn btn-info">アンケートに回答する</a>
@@ -166,7 +166,7 @@
                 const confidence = info.confidence.toFixed(2);  // 信頼度は小数点以下2桁にフォーマット
 
                 // フォーマットされたテキストをリストアイテムに追加
-                listItem.textContent = `${code} x: ${x}, y: ${y}, 幅: ${width}, 高さ: ${height}, 信頼度: ${confidence}`;
+                listItem.textContent = `${code} x: ${x}, y: ${y}, 信頼度: ${confidence}`;
 
                 gameInfoList.appendChild(listItem);  // ulタグにliタグを追加
             });
