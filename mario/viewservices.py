@@ -159,9 +159,9 @@ def process_game_info(game_info, current_time):
                 if "Kuribo" in label or "Kinoko" in label:
                     if "Fire Mario" in mario_state["state"]:
                         collision_message = (
-                            "ファイヤーマリオでクリボーに当たって死亡しました！\n"
+                            "ファイヤーマリオでクリボーに当たってしまいました\n"
                             "ファイヤーマリオなら、ファイアボールを使ってクリボーを倒すことができます。\n"
-                            "次は火を使って進むと良いでしょう。5秒前に戻って再挑戦してください！"
+                            "次は火を使って進むと良いでしょう"
                         )
                     else:
                         collision_message = (
@@ -176,13 +176,13 @@ def process_game_info(game_info, current_time):
                         mario_state["y"] < bros_y_coordinate[0]["y"]
                     ):  # マリオより上にブロスがいる時
                         collision_message = (
-                            "ハンマーブロスのハンマーに当たって死亡しました！\n"
+                            "上にいるハンマーブロスで死んでしまいました\n"
                             "下に通り抜けるチャンスがあります。足元の足場を使って下をくぐったり\n"
                             "また、上の足場を叩いて倒すことも可能です。5秒前に戻って再挑戦！"
                         )
                     else:
                         collision_message = (
-                            "ハンマーブロスのハンマーに当たって死亡しました！\n"
+                            "ハンマーブロスのに当たって死亡しました！\n"
                             "ハンマーの動きを注意深く見て近づき、ジャンプするタイミングで通り抜けてみましょう\n"
                             "踏みつけて倒すこともできますよ、再挑戦してみてください！"
                         )
@@ -210,7 +210,7 @@ def process_game_info(game_info, current_time):
                     #     )
                     collision_message = (
                         "げっそーにやられました！\n"
-                        "どちらのタイプか不明ですが、足場を活用して回避するのが重要です。\n"
+                        "逃げるタイプと近づいてくるタイプがいるので，慎重に見極めて，進んで行くといいですよ\n"
                         "5秒前に戻って、安全な場所を探しながら進んでみましょう。"
                     )
 
@@ -220,7 +220,7 @@ def process_game_info(game_info, current_time):
                         "Fire Mario" in mario_state["state"]
                     ):  # ファイヤーマリオが有効な場合
                         collision_message = (
-                            "パックンフラワーに近づきすぎて死亡しました！\n"
+                            "パックンフラワーにぶつかってしまいました！\n"
                             "ファイヤーマリオなら、ファイアボールでパックンフラワーを倒せます。\n"
                             "安全に進むために、5秒前に戻って再挑戦してみましょう。"
                         )
@@ -257,7 +257,7 @@ def process_game_info(game_info, current_time):
                 elif "Nokonoko" in label:
                     if "Fire Mario" in mario_state["state"]:  # ファイヤーマリオなら
                         collision_message = (
-                            "ノコノコにぶつかって死亡しました！\n"
+                            "ノコノコにぶつかってしまいました\n"
                             "ファイヤーマリオなら、ノコノコを倒すためにファイアボールを使うことができます。\n"
                             "5秒前に戻って、ファイアボールを使って進みましょう！"
                         )
@@ -283,13 +283,13 @@ def process_game_info(game_info, current_time):
                             "また、その甲羅を利用して遠くの敵を倒すことができます。5秒前に戻って再挑戦！"
                         )
 
-                # パタパタに遭遇した場合
+                # メットに遭遇した場合
                 elif "Met" in label:
                     if "Fire Mario" in mario_state["state"]:  # ファイヤーマリオなら
                         collision_message = (
-                            "パタパタにぶつかって死亡しました！\n"
+                            "パタパタにぶつかってしまいました！\n"
                             "メットはファイヤーマリオの火を防ぎます。\n"
-                            "倒す方法は踏みつけることです！動きが遅いので避けてみるのもいいかもしれません。５秒前に戻って再挑戦！"
+                            "倒す方法は踏みつけることのみです！動きが遅いので避けてみるのもいいかもしれません。５秒前に戻って再挑戦！"
                         )
                     else:
                         collision_message = (
@@ -340,13 +340,13 @@ def process_game_info(game_info, current_time):
                 elif "Fish" in label:  # 魚にぶつかった場合
                     if "Scaffold Sky" in element["code"]:
                         collision_message = (
-                            "魚にぶつかって死亡しました！\n"
+                            "空プクプクにぶつかって死亡しました！\n"
                             "魚が少し追い越し気味に飛んできます \n"
                             "一気に走り抜けるか，ゆっくり着地点を見ながら進んでみよう"
                             )
                     else:
                         collision_message = (
-                            "魚にぶつかって死亡しました！\n"
+                            "水中のプクプクにぶつかって死亡しました！\n"
                             "水中ではまっすぐ泳いてくるため，動線や魚の位置を確認しましょう。\n"
                             "水中でもジャンプのタイミングを見計らって進んでください。5秒前に戻って再挑戦！"
                         )
