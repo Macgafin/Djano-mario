@@ -140,16 +140,16 @@ def questionnaire(request):
         if form.is_valid():
             # 同期的にファイルに書き込む
             with open("mario/static/mario/questionnaire.txt", "a", encoding="utf-8") as f:
-                f.write("ゲーム進行のスムーズさ: {}\n".format(form.cleaned_data["game_progression"]))
-                f.write("フィードバックの有用性: {}\n".format(form.cleaned_data["feedback_usefulness"]))
-                f.write("学習効果: {}\n".format(form.cleaned_data["learning_effect"]))
-                f.write("進捗効果: {}\n".format(form.cleaned_data["learning_progress"]))
-                f.write("組み合わせ: {}\n".format(form.cleaned_data["learning_combination"]))
-                f.write("システムの使いやすさ: {}\n".format(form.cleaned_data["system_usability"]))
-                f.write("システム利用しての総合評価: {}\n".format(form.cleaned_data["overall_experience"]))
-                f.write("発展性評価: {}\n".format(form.cleaned_data["System_Development"]))
-                f.write("システム前の状態: {}\n".format(form.cleaned_data["pre_system_feedback"]))
-                f.write("システム利用後の状態: {}\n".format(form.cleaned_data["post_system_feedback"]))
+                f.write("システムを使うことで、ゲームが進めやすくなったと感じましたか？: {}\n".format(form.cleaned_data["game_progression"]))
+                f.write("やられた瞬間に巻き戻すことで、フィードバックは役立ちましたか？: {}\n".format(form.cleaned_data["feedback_usefulness"]))
+                f.write("やられた後のフィードバックは、学習を向上させたと思いますか？: {}\n".format(form.cleaned_data["learning_effect"]))
+                f.write("システムを通じてゲームの進捗状況は改善されたと感じますか？: {}\n".format(form.cleaned_data["learning_progress"]))
+                f.write("巻き戻し機能とフィードバックの組み合わせは有効と感じましたか？: {}\n".format(form.cleaned_data["learning_combination"]))
+                f.write("ゲームプレイ中において，システムは使いやすかったですか？: {}\n".format(form.cleaned_data["system_usability"]))
+                f.write("システムを使ってみて、全体的にどう感じましたか？: {}\n".format(form.cleaned_data["overall_experience"]))
+                f.write("本システムの観点は将来的にほかのゲームにおいても影響を与えられると思いますか？: {}\n".format(form.cleaned_data["System_Development"]))
+                f.write("システム利用前のゲームに関する状態や感想: {}\n".format(form.cleaned_data["pre_system_feedback"]))
+                f.write("システム利用後の状態や感想: {}\n".format(form.cleaned_data["post_system_feedback"]))
                 f.write("システム利用の感想: {}\n".format(form.cleaned_data["feedback"]))
                 f.write("改善点: {}\n".format(form.cleaned_data["suggestions"]))
                 f.write("-" * 40 + "\n")  # 区切り線
