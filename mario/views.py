@@ -133,7 +133,7 @@ def image_details(request):
     return render(request, "mario/image_details.html", {"game_info": game_info})
 
 
-# 質問フォームの処理
+# 最最後のアンケートフォームの処理
 def questionnaire(request):
     if request.method == "POST":
         form = QuestionnaireForm(request.POST)
@@ -163,6 +163,30 @@ def questionnaire(request):
 
     return render(request, "mario/questionnaire.html", {"form": form})
 
+#　中間のアンケートフォームの処理
+def questionnaire_middle(request):
+    if request.method == "POST":
+        form = QuestionnaireForm(request.POST)
+        if form.is_valid():
+            # 同期的にファイルに書き込む
+            with open("mario/static/mario/questionnaire_middle.txt", "a", encoding="utf-8") as f:
+                f.write("-" * 40 + "\n") 
+                f.write("マリオをプレイしてみてやめたくなると思いましたか？: {}\n".format(form.cleaned_data["quit_game"]))
+                f.write("マリオをもう一度プレイしてみたいと思いましたか？: {}\n".format(form.cleaned_data["replay_game"]))
+                f.write("失敗したときにマリオをプレイしてみてやめたくなったと思いましたか？: {}\n".format(form.cleaned_data["quit_on_failure"]))
+                f.write("失敗したときにマリオをもう一度プレイしてみたいと思いましたか？: {}\n".format(form.cleaned_data["replay_on_failure"]))
+                f.write("マリオをプレイし続けたいと思いましたか？: {}\n".format(form.cleaned_data["continue_game"]))
+                f.write("マリオ最後のステージまでクリアしたいと思いましたか？: {}\n".format(form.cleaned_data["complete_game"]))
+                f.write("+" * 40 + "\n")  # 区切り線
+
+            # フォームをリセットして確認メッセージを表示
+            form = QuestionnaireForm()  # 空のフォームを再生成
+            return render(request, "mario/home.html", {"form": form})  # 送信後にThank youページを表示
+
+    else:
+        form = QuestionnaireForm()
+
+    return render(request, "mario/questionnaire_middle.html", {"form": form})
 
 # フィードバックを保存する処理
 @csrf_exempt

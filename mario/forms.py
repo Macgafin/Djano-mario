@@ -138,3 +138,76 @@ class QuestionnaireForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": 4, "placeholder": "改善してほしい点など"}),
         required=False,
     )
+    
+    #　以下中間用のフォーム
+    quit_game = forms.ChoiceField(
+        label="マリオをプレイしてみてやめたくなると思いましたか？",
+        choices=[ 
+            (1, "1 - 全くそう思わなかった"),
+            (2, "2 - あまりそう思わなかった"),
+            (3, "3 - 普通"),
+            (4, "4 - 思った"),
+            (5, "5 - とてもそう思った"),
+        ],
+        widget=forms.RadioSelect,
+    )
+
+    replay_game = forms.ChoiceField(
+        label="マリオをもう一度プレイしてみたいと思いましたか？",
+        choices=[ 
+            (1, "1 - 全くそう思わなかった"),
+            (2, "2 - あまりそう思わなかった"),
+            (3, "3 - 普通"),
+            (4, "4 - 思った"),
+            (5, "5 - とてもそう思った"),
+        ],
+        widget=forms.RadioSelect,
+    )
+
+    quit_on_failure = forms.ChoiceField(
+        label="失敗したときにマリオをプレイしてみてやめたくなったと思いましたか？",
+        choices=[ 
+            (1, "1 - 全くそう思わなかった"),
+            (2, "2 - あまりそう思わなかった"),
+            (3, "3 - 普通"),
+            (4, "4 - 思った"),
+            (5, "5 - とてもそう思った"),
+        ],
+        widget=forms.RadioSelect,
+    )
+
+    replay_on_failure = forms.ChoiceField(
+        label="失敗したときにマリオをもう一度プレイしてみたいと思いましたか？",
+        choices=[ 
+            (1, "1 - 全くそう思わなかった"),
+            (2, "2 - あまりそう思わなかった"),
+            (3, "3 - 普通"),
+            (4, "4 - 思った"),
+            (5, "5 - とてもそう思った"),
+        ],
+        widget=forms.RadioSelect,
+    )
+
+    continue_game = forms.ChoiceField(
+        label="マリオをプレイし続けたいと思いましたか？",
+        choices=[ 
+            (1, "1 - 全くそう思わなかった"),
+            (2, "2 - あまりそう思わなかった"),
+            (3, "3 - 普通"),
+            (4, "4 - 思った"),
+            (5, "5 - とてもそう思った"),
+        ],
+        widget=forms.RadioSelect,
+    )
+
+    complete_game = forms.ChoiceField(
+        label="マリオ最後のステージまでクリアしたいと思いましたか？",
+        choices=[ 
+            (1, "1 - 全くそう思わなかった"),
+            (2, "2 - あまりそう思わなかった"),
+            (3, "3 - 普通"),
+            (4, "4 - 思った"),
+            (5, "5 - とてもそう思った"),
+        ],
+        widget=forms.RadioSelect,
+    )

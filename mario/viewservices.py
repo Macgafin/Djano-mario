@@ -43,13 +43,15 @@ def process_game_info(game_info, current_time):
     bros_y_coordinate = []  # ハンマーブロスの環境を格納するリスト
     mario_history = []  # マリオの位置履歴を格納
     collision_message = "問題なし"
+    
+
 
     # マリオの状態を特定し、他の要素をelementsに格納
     for (
         element
     ) in (
         game_info
-    ):  # 間違えやすいが、ここのelementは格納されるelementsとは別のことである
+    ):              # 間違えやすいが、ここのelementは格納されるelementsとは別のことである
         # マリオの状態を判定し、マリオの状態を設定
         if "Small Mario" in element["code"]:
             mario_state = {
@@ -124,6 +126,8 @@ def process_game_info(game_info, current_time):
             element_right = element["x"] + element["width"] / 2
             element_top = element["y"] - element["height"] / 2
             element_bottom = element["y"] + element["height"] / 2
+            
+            
 
             # 衝突判定
             if (
@@ -373,6 +377,5 @@ def process_game_info(game_info, current_time):
                     )
 
 
-    print(collision_message)
     print("-------------------------------------")
     return collision_message

@@ -108,16 +108,17 @@
                         <label for="feedback_input">フィードバックのメモ記入欄:</label>
                         <textarea class="form-control" id="feedback_input" name="feedback"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">送信</button>
+                    <button type="submit" class="btn btn-primary mb-3">送信</button> <!-- ボタンにマージン追加 -->
                 </form>
+                
                 <h3>アンケート</h3>
                 <form action="/submit_experience" method="POST">
                     <div class="form-group">
-                        <label for="experience_input">前半の１５分を経ての振り返りを記入してください:</label>
-                        <textarea class="form-control" id="experience_input" name="experience"></textarea>
+                        <label for="experience_input">振り返りアンケートになります</label>
                     </div>
-                    <a href="{% url 'questionnaire' %}" class="btn btn-info">アンケートに回答する</a>
-                    <button type="submit" class="btn btn-primary">送信</button>
+                    <!-- ボタンを縦並びにし、上下の間隔と色を変更 -->
+                    <a href="{% url 'questionnaire_middle' %}" class="btn btn-success mb-3">中間のアンケートに回答する</a> <!-- 色と間隔変更 -->
+                    <a href="{% url 'questionnaire' %}" class="btn btn-primary">最後のアンケートに回答する</a> <!-- 色変更 -->
                 </form>
             </div>
         </div>

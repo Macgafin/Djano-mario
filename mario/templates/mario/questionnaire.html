@@ -133,6 +133,16 @@
             .textarea-large {
                 height: 200px; /* より大きな高さに設定 */
             }
+
+            /* タイトルのスタイル */
+            .experiment-title {
+                text-align: center;
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #17a2b8;
+                margin-bottom: 30px;
+            }
+        </style>
         </style>
     </head>
 <body>
@@ -142,6 +152,39 @@
         <form method="post">
             {% csrf_token %}
             <div class="box">
+                <div class="experiment-title">
+                    実験２について
+                </div>
+
+                <div class="mb-3">
+                    <label for="quit_game" class="form-label">マリオをプレイしてみてやめたくなると思いましたか？</label>
+                    {{ form.quit_game }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="replay_game" class="form-label">マリオをもう一度プレイしてみたいと思いましたか？</label>
+                    {{ form.replay_game }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="quit_on_failure" class="form-label">失敗したときにマリオをプレイしてみてやめたくなったと思いましたか？</label>
+                    {{ form.quit_on_failure }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="replay_on_failure" class="form-label">失敗したときにマリオをもう一度プレイしてみたいと思いましたか？</label>
+                    {{ form.replay_on_failure }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="continue_game" class="form-label">マリオをプレイし続けたいと思いましたか？</label>
+                    {{ form.continue_game }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="complete_game" class="form-label">マリオ最後のステージまでクリアしたいと思いましたか？</label>
+                    {{ form.complete_game }}
+                </div>
                 <div class="mb-3">
                     <p>システム上では誤判定等がありますが，それらがすべてうまくいったていて考えていただくと</p>
                     <label for="game_progression" class="form-label">システムを使うことで、ゲームが進めやすくなったと感じましたか？</label>
